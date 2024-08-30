@@ -10,11 +10,11 @@ document.getElementById('show-login').addEventListener('click', function() {
 
 // Emoji change on input
 document.getElementById('login-email').addEventListener('input', function() {
-    document.getElementById('emoji-icon').textContent = this.value && document.getElementById('login-password').value ? '👨‍💻👩‍💻' : '🙋‍♂🙋‍♀';
+    document.getElementById('emoji-icon').textContent = this.value && document.getElementById('login-email').value ? '👨‍💻👩‍💻' : '🙋‍♂🙋‍♀';
 });
 
 document.getElementById('login-password').addEventListener('input', function() {
-    document.getElementById('emoji-icon').textContent = this.value && document.getElementById('login-email').value ? '👨‍💻👩‍💻' : '🙋‍♂🙋‍♀';
+    document.getElementById('emoji-icon').textContent = this.value && document.getElementById('login-password').value ? '👨‍💻👩‍💻' : '🙋‍♂🙋‍♀';
 });
 
 // Emoji change on error
