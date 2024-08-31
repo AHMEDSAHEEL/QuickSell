@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Signup</title>
+    <link rel="stylesheet" href="../css/loginSignUp.css">
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="login-container" class="form-container">
+            <div class="form-header">
+                <span class="emoji colored-emoji" id="emoji-icon">🙋‍♂🙋‍♀</span>
+                <h4 id="success"></h4>
+                <h4 id="failure"></h4>
+                <h2 id="welcome">Welcome Back!</h2>
+                <p>Please login to your account</p>
+            </div>
+            <form id="login-form">
+                <div class="input-container">
+                    <span class="input-icon">📧</span>
+                    <input type="email" id="login-email" placeholder="Email" required>
+                </div>
+                <div class="input-container">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <span class="toggle-visibility" id="toggle-login-password">👁️</span>
+                </div>
+                <div id="login-spinner" class="spinner hidden"></div>
+                <button type="submit" class="btn">Login</button>
+                <p>Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
+            </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-container" class="form-container hidden">
+            <div class="form-header">
+                <span class="emoji colored-emoji" id="signup-emoji-icon">🙋‍♂🙋‍♀</span>
+                <h2 >Create Account</h2>
+                <p>Please fill in the details to sign up</p>
+            </div>
+            <form id="signup-form">
+                <div class="input-container">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="signup-username" placeholder="Username" required>
+                </div>
+                <div class="input-container">
+                    <span class="input-icon">📧</span>
+                    <input type="email" id="signup-email" placeholder="Email" required>
+                </div>
+                <div class="input-container">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <span class="toggle-visibility" id="toggle-signup-password">👁️</span>
+                </div>
+                <div class="input-container">
+                    <span class="input-icon">📞</span>
+                    <input type="number" id="signup-mobile" placeholder="Mobile" required>
+                </div>
+                
+                <div id="signup-spinner" class="spinner hidden"></div>
+                <button type="submit" class="btn">Sign Up</button>
+                <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+            </form>
+        </div>
+    </div>
+    <script src="../js/loginSignup.js"></script>
+</body>
+</html>

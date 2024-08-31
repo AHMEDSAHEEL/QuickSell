@@ -1,0 +1,179 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: rgb(112, 186, 232); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 1rem;
+}
+
+.container {
+    background: rgb(52, 154, 217); 
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 550px;
+    width: 100%;
+}
+
+.form-container {
+    padding: 40px;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: scale(1);
+}
+
+.form-container.hidden {
+    display: none;
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+.form-container.active {
+    display: block;
+    animation: slideIn 0.8s forwards;
+}
+
+.form-container.out {
+    animation: slideOut 0.8s forwards;
+}
+
+.form-header .emoji {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.form-header h2 {
+    margin: 10px 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.form-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+.input-container {
+    display: flex;
+    position: relative;
+    margin: 10px 0;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+}
+
+input{
+    width: 89%;
+    padding: 15px 15px 15px 40px;
+    margin: 10px 0;
+    border: 0;
+    outline: 0;
+    background-color: rgb(171, 219, 249);
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.toggle-visibility {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.btn {
+    background-color: #0056b3;
+    color: white;
+    padding: 15px;
+    width: 50%;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #2b74c2;
+}
+
+p {
+    font-size: 14px;
+    color: #666;
+    margin-top: 20px;
+}
+
+a {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#success {
+    display: none;
+    font-size: 1.2rem;
+    color: green;
+}
+
+#failure {
+    display: none;
+    font-size: 1.2rem;
+    color: red;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+.spinner {
+    margin: 0 auto;
+    border: 4px solid rgba(0, 0, 0, 0.1); /* Light grey border */
+    border-left: 4px solid #0056b3; /* Darker blue color for the spinner */
+    border-radius: 50%; /* Make it circular */
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite; /* Spin animation */
+    margin-bottom: 10px;
+    transform: translate(-50%, -50%); /* Center it */
+}
+
+/* Spin animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hide spinner by default */
+.hidden {
+    display:none;
+}

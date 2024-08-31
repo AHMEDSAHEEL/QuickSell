@@ -1,73 +1,113 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Signup</title>
+    <title>Expiring Soon - Save More, Waste Less</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Login Form -->
-        <div id="login-container" class="form-container">
-            <div class="form-header">
-                <span class="emoji colored-emoji" id="emoji-icon">🙋‍♂🙋‍♀</span>
-                <h4 id="success"></h4>
-                <h4 id="failure"></h4>
-                <h2 id="welcome">Welcome Back!</h2>
-                <p>Please login to your account</p>
-            </div>
-            <form id="login-form">
-                <div class="input-container">
-                    <span class="input-icon">📧</span>
-                    <input type="email" id="login-email" placeholder="Email" required>
-                </div>
-                <div class="input-container">
-                    <span class="input-icon">🔒</span>
-                    <input type="password" id="login-password" placeholder="Password" required>
-                    <span class="toggle-visibility" id="toggle-login-password">👁️</span>
-                </div>
-                <div id="login-spinner" class="spinner hidden"></div>
-                <button type="submit" class="btn">Login</button>
-                <p>Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
-            </form>
-        </div>
+    <!-- Header -->
+    <body>
 
-        <!-- Signup Form -->
-        <div id="signup-container" class="form-container hidden">
-            <div class="form-header">
-                <span class="emoji colored-emoji" id="signup-emoji-icon">🙋‍♂🙋‍♀</span>
-                <h2 >Create Account</h2>
-                <p>Please fill in the details to sign up</p>
+        <header>
+            <div class="logo">Expiring Products</div>
+            <div class="hamburger" id="hamburger">
+                <div></div>
+                <div></div>
+                <div></div>
             </div>
-            <form id="signup-form">
-                <div class="input-container">
-                    <span class="input-icon">👤</span>
-                    <input type="text" id="signup-username" placeholder="Username" required>
-                </div>
-                <div class="input-container">
-                    <span class="input-icon">📧</span>
-                    <input type="email" id="signup-email" placeholder="Email" required>
-                </div>
-                <div class="input-container">
-                    <span class="input-icon">🔒</span>
-                    <input type="password" id="signup-password" placeholder="Password" required>
-                    <span class="toggle-visibility" id="toggle-signup-password">👁️</span>
-                </div>
-                <div class="input-container">
-                    <span class="input-icon">📞</span>
-                    <input type="number" id="signup-mobile" placeholder="Mobile" required>
-                </div>
-                
-                <div id="signup-spinner" class="spinner hidden"></div>
-                <button type="submit" class="btn">Sign Up</button>
-                <p>Already have an account? <a href="#" id="show-login">Login</a></p>
-            </form>
+            <nav id="nav">
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="sign-in"><a href="html/loginSignUp.html">Sign-in</a></div>
+        </header>
+        
+        <div id="hero">
+            <h1>Never Miss a Deal!</h1>
+            <p>Get notified about products that are about to expire and grab them at a discount!</p>
+            <button onclick="window.location.href='#products'">Start Shopping</button>
+        <button onclick="window.location.href='#how-it-works'">Learn More</button>
         </div>
-    </div>
+        
+        <div id="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <img src="../images/shop.png" alt="Step 1">
+                    <h3>Step 1</h3>
+                    <p>Shop owners list products about to expire.</p>
+                </div>
+                <div class="step">
+                    <img src="../images/userNoti.png" alt="Step 2">
+                    <h3>Step 2</h3>
+                    <p>Users get notified and see the best deals.</p>
+                </div>
+                <div class="step">
+                    <img src="../images/discount.png" alt="Step 3">
+                    <h3>Step 3</h3>
+                    <p>Users buy products before they expire.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="products">
+            <h2>Products</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="../images/product.png" alt="Product 1">
+                    <h3>Product 1</h3>
+                    <p>Discounted Price: $5.99</p>
+                    <p>Expires in 2 days</p>
+                </div>
+                <div class="product-card">
+                    <img src="../images/product.png" alt="Product 2">
+                    <h3>Product 2</h3>
+                    <p>Discounted Price: $7.99</p>
+                    <p>Expires in 5 days</p>
+                </div>
+                <div class="product-card">
+                    <img src="../images/product.png" alt="Product 3">
+                    <h3>Product 3</h3>
+                    <p>Discounted Price: $3.99</p>
+                    <p>Expires in 1 day</p>
+                </div>
+                <div class="product-card">
+                    <img src="../images/product.png" alt="Product 1">
+                    <h3>Product 1</h3>
+                    <p>Discounted Price: $5.99</p>
+                    <p>Expires in 2 days</p>
+                </div>
+                <div class="product-card">
+                    <img src="../images/product.png" alt="Product 2">
+                    <h3>Product 2</h3>
+                    <p>Discounted Price: $7.99</p>
+                    <p>Expires in 5 days</p>
+                </div>
+                <div class="product-card">
+                    <img src="../images/product.png" alt="Product 3">
+                    <h3>Product 3</h3>
+                    <p>Discounted Price: $3.99</p>
+                    <p>Expires in 1 day</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer id="contact">
+            <p>&copy; 2024 Expiring Products. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+            </div>
+            <div class="social-media">
+                <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">Instagram</a>
+            </div>
+        </footer>
     <script src="js/index.js"></script>
 </body>
 </html>
