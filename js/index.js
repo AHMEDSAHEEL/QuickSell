@@ -74,7 +74,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
             //  success.style.display="none"; 
             //  document.getElementById('welcome').style.display="block";// Update emoji after delay
             
-             window.location.href="../html/home.html";
+             window.location.href="html/home.html";
              hideSpinner();
              document.getElementById('login-form').reset();
         }, 3500); 
