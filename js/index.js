@@ -46,6 +46,8 @@ document.getElementById('login-form').addEventListener('submit', function(event)
     const password = document.getElementById('login-password').value;
     const success=document.getElementById('success');
     const failure=document.getElementById('failure');
+    success.style.display="none";
+    failure.style.display="none";
     showSpinner();
     // Dummy validation for example purposes
     if (email === "shaheel123as@gmail.com" && password === "Abc123###.") {
