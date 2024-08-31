@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login and Signup</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container">
@@ -27,7 +30,7 @@
                     <input type="password" id="login-password" placeholder="Password" required>
                     <span class="toggle-visibility" id="toggle-login-password">👁️</span>
                 </div>
-                <div id="spinner" class="spinner hidden"></div>
+                <div id="login-spinner" class="spinner hidden"></div>
                 <button type="submit" class="btn">Login</button>
                 <p>Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
             </form>
@@ -37,7 +40,7 @@
         <div id="signup-container" class="form-container hidden">
             <div class="form-header">
                 <span class="emoji colored-emoji" id="signup-emoji-icon">🙋‍♂🙋‍♀</span>
-                <h2>Create Account</h2>
+                <h2 >Create Account</h2>
                 <p>Please fill in the details to sign up</p>
             </div>
             <form id="signup-form">
@@ -54,7 +57,12 @@
                     <input type="password" id="signup-password" placeholder="Password" required>
                     <span class="toggle-visibility" id="toggle-signup-password">👁️</span>
                 </div>
-                <div id="spinner" class="spinner hidden"></div>
+                <div class="input-container">
+                    <span class="input-icon">📞</span>
+                    <input type="number" id="signup-mobile" placeholder="Mobile" required>
+                </div>
+                
+                <div id="signup-spinner" class="spinner hidden"></div>
                 <button type="submit" class="btn">Sign Up</button>
                 <p>Already have an account? <a href="#" id="show-login">Login</a></p>
             </form>

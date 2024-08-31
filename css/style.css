@@ -71,11 +71,13 @@ body {
     font-size: 18px;
 }
 
-input[type="text"], input[type="email"], input[type="password"] {
+input{
     width: 89%;
     padding: 15px 15px 15px 40px;
     margin: 10px 0;
-    border: 1px solid #ddd;
+    border: 0;
+    outline: 0;
+    background-color: rgb(171, 219, 249);
     border-radius: 5px;
     font-size: 16px;
 }
