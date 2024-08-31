@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-    background: rgb(88, 172, 224); 
+    background: rgb(52, 154, 217); 
     /* background-color:  rgb(28, 150, 225);  */
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -85,7 +85,7 @@ input[type="text"], input[type="email"], input[type="password"] {
 }
 
 .btn {
-    background-color: #007bff;
+    background-color: #0056b3;
     color: white;
     padding: 15px;
     width: 50%;
@@ -97,7 +97,7 @@ input[type="text"], input[type="email"], input[type="password"] {
 }
 
 .btn:hover {
-    background-color: #0056b3;
+    background-color: #2b74c2;
 }
 
 p {
@@ -107,7 +107,7 @@ p {
 }
 
 a {
-    color: #007bff;
+    color: #0056b3;
     text-decoration: none;
 }
 
