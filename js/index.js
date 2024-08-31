@@ -65,7 +65,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
       
         
     }, 2000);
-        //document.getElementById('emoji-icon').textContent="🙋‍♂🙋‍♀";
+      
         
         setTimeout(function() {
             // Perform actions after the timeout
@@ -77,6 +77,9 @@ document.getElementById('login-form').addEventListener('submit', function(event)
              window.location.href="html/home.html";
              hideSpinner();
              document.getElementById('login-form').reset();
+             document.getElementById('emoji-icon').textContent="🙋‍♂🙋‍♀";
+             document.getElementById('welcome').style.display="block";
+             success.style.display="none";
         }, 3500); 
       
        //alert("Login successful!");
