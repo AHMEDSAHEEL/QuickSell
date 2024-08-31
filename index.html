@@ -27,6 +27,7 @@
                     <input type="password" id="login-password" placeholder="Password" required>
                     <span class="toggle-visibility" id="toggle-login-password">👁️</span>
                 </div>
+                <div id="spinner" class="spinner hidden"></div>
                 <button type="submit" class="btn">Login</button>
                 <p>Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
             </form>
@@ -35,7 +36,7 @@
         <!-- Signup Form -->
         <div id="signup-container" class="form-container hidden">
             <div class="form-header">
-                <span class="emoji colored-emoji">🙋‍♂🙋‍♀</span>
+                <span class="emoji colored-emoji" id="signup-emoji-icon">🙋‍♂🙋‍♀</span>
                 <h2>Create Account</h2>
                 <p>Please fill in the details to sign up</p>
             </div>
@@ -53,6 +54,7 @@
                     <input type="password" id="signup-password" placeholder="Password" required>
                     <span class="toggle-visibility" id="toggle-signup-password">👁️</span>
                 </div>
+                <div id="spinner" class="spinner hidden"></div>
                 <button type="submit" class="btn">Sign Up</button>
                 <p>Already have an account? <a href="#" id="show-login">Login</a></p>
             </form>

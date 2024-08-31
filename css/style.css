@@ -1,8 +1,6 @@
-
 body {
     font-family: 'Roboto', sans-serif;
-     /* background-color: #4eddf3;  */
-     background-color:  rgb(112, 186, 232); 
+    background-color: rgb(112, 186, 232); 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,7 +10,6 @@ body {
 
 .container {
     background: rgb(52, 154, 217); 
-    /* background-color:  rgb(28, 150, 225);  */
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -35,6 +32,15 @@ body {
     pointer-events: none;
 }
 
+.form-container.active {
+    display: block;
+    animation: slideIn 0.8s forwards;
+}
+
+.form-container.out {
+    animation: slideOut 0.8s forwards;
+}
+
 .form-header .emoji {
     font-size: 40px;
     margin-bottom: 10px;
@@ -53,7 +59,6 @@ body {
 
 .input-container {
     display: flex;
-    
     position: relative;
     margin: 10px 0;
 }
@@ -114,13 +119,59 @@ a {
 a:hover {
     text-decoration: underline;
 }
-#success{
+
+#success {
     display: none;
     font-size: 1.2rem;
     color: green;
 }
-#failure{
+
+#failure {
     display: none;
     font-size: 1.2rem;
     color: red;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+.spinner {
+    margin: 0 auto;
+    border: 4px solid rgba(0, 0, 0, 0.1); /* Light grey border */
+    border-left: 4px solid #0056b3; /* Darker blue color for the spinner */
+    border-radius: 50%; /* Make it circular */
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite; /* Spin animation */
+    margin-bottom: 10px;
+    transform: translate(-50%, -50%); /* Center it */
+}
+
+/* Spin animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hide spinner by default */
+.hidden {
+    display:none;
 }
