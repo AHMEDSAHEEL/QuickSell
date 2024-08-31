@@ -52,6 +52,8 @@ body {
 }
 
 .input-container {
+    display: flex;
+    
     position: relative;
     margin: 10px 0;
 }
