@@ -45,6 +45,51 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = 'html/profile.html';
     });
     
+    // Example function to get the user's profile picture URL after login
+    function updateProfilePictureFromFirestore() {
+        const user = firebase.auth().currentUser;
+    
+        if (user) {
+            const db = firebase.firestore();
+            const userRef = db.collection('users').doc(user.uid);
+    
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    const profilePicUrl = userData.profileImageUrl; // Assuming you store the URL under `profileImageUrl`
+    
+                    if (profilePicUrl) {
+                        // Update the profile picture in the index page
+                        const profilePictureElement = document.getElementById('userProfile');
+                        if (profilePictureElement) {
+                            profilePictureElement.src = profilePicUrl;
+                            console.log("Profile picture updated from Firestore:", profilePicUrl);
+                        } else {
+                            console.error("Element with id 'userProfile' not found.");
+                        }
+                    } else {
+                        console.log("No profile picture URL found in Firestore.");
+                    }
+                } else {
+                    console.log("No user document found in Firestore.");
+                }
+            }).catch((error) => {
+                console.error("Error getting document from Firestore:", error);
+            });
+        } else {
+            console.error("No authenticated user found.");
+        }
+    }
+    
+    // Call this function after login
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            updateProfilePictureFromFirestore();
+            // Additional code to handle successful login
+        } else {
+            console.error("No user signed in.");
+        }
+    });
     
     
     document.getElementById('product-image').addEventListener('change', function() {
@@ -179,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Remove the product card from the DOM after the grace period
                     deleteProductFromFirestore(id, imageFileUrl);
                     newProductCard.remove();
-                }, 1000000);
+                }, 10000);
             }
         }
     

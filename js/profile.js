@@ -8,13 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // Check user authentication state
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             const userRef = db.collection('users').doc(user.uid);
@@ -27,19 +25,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (userData.profileImageUrl) {
                     profilePicture.src = userData.profileImageUrl;
                 } else {
-                    profilePicture.src = 'default-profile.png'; // Default image
+                    profilePicture.src = '../images/userPofile.png'; // Default image path
                 }
             } else {
                 console.log('No such document!');
             }
         } else {
             console.log('No user is signed in.');
-            // Redirect to login/signup page if no user is signed in
             window.location.href = '../html/loginSignUp.html';
         }
     });
 
-    // Handle profile picture preview
     document.getElementById('profile-picture-input').addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -56,7 +52,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Handle profile picture upload
     document.getElementById('save-button').addEventListener('click', async () => {
         const fileInput = document.getElementById('profile-picture-input');
         const file = fileInput.files[0];
@@ -67,18 +62,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             const storageRef = firebase.storage().ref();
             const profilePicRef = storageRef.child(`profilePictures/${user.uid}/${file.name}`);
 
-            // Show loader
             loader.style.display = 'block';
 
             try {
-                // Upload the file to Firebase Storage
+                // Retrieve current user profile image URL
+                const userRef = db.collection('users').doc(user.uid);
+                const userDoc = await userRef.get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    if (userData.profileImageUrl) {
+                        const oldProfilePicRef = storage.refFromURL(userData.profileImageUrl);
+                        try {
+                            await oldProfilePicRef.delete(); // Delete the existing profile picture
+                        } catch (deleteError) {
+                            console.error('Error deleting old profile picture:', deleteError);
+                        }
+                    }
+                }
+
+                // Upload the new profile picture
                 const snapshot = await profilePicRef.put(file);
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Update Firestore with the new profile image URL
-                await db.collection('users').doc(user.uid).update({
-                    profileImageUrl: downloadURL
-                });
+                await userRef.update({ profileImageUrl: downloadURL });
 
                 // Update the profile picture on the page
                 document.getElementById('profile-picture').src = downloadURL;
@@ -87,7 +94,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error('Error uploading profile picture:', error);
                 alert('Error uploading profile picture.');
             } finally {
-                // Hide loader
                 loader.style.display = 'none';
             }
         } else {
@@ -95,11 +101,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Handle logout
     document.getElementById('logout-button').addEventListener('click', async () => {
         try {
             await auth.signOut();
-            // Redirect to login/signup page
             window.location.href = '../html/loginSignUp.html';
         } catch (error) {
             console.error('Error logging out:', error);

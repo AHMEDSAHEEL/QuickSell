@@ -27,14 +27,20 @@ a {
     margin-bottom: 30px;
     margin-top: 10px;
 }
-.userProfile img{
+.userProfile img {
     order: 3;
     width: 30px;
     height: 30px;
-    
     border-radius: 50%;
-   
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
+
+/* Scale up the profile picture on hover */
+.userProfile img:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 8px rgba(188, 186, 186, 0.2);
+}
+
 /* Header Styles */
 header {
     
@@ -184,8 +190,8 @@ li:hover{
     padding: 50px 20px;
     background-image: linear-gradient(#13072e,#200b4e);
     color: white;
-    /* animation: slideInLeft 1s ease-out forwards; */
-    /* overflow-x: hidden; */
+    animation: slideInLeft 1s ease-out forwards; 
+    overflow-x: hidden; 
 }
 
 #products h2 {
@@ -217,7 +223,7 @@ li:hover{
 }
 
 .product-card img {
-    max-width: 100%;
+    width: 100%;
     height: 200px;
     object-fit: cover;
     border-radius: 5px;
@@ -287,7 +293,7 @@ footer {
 
 /* Animation Keyframes */
 /* Hero Section Styles */
-/* #hero.animate {
+ #hero.animate {
     animation: slideInLeft 0.1s ease-out forwards;
 }
 
