@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
             viewMoreButton.textContent = 'View More';
             viewMoreButton.classList.add('view-more');
             viewMoreButton.addEventListener('click', () => {
-                window.location.href = '../html/product.html'; // Navigate to product.html
+                window.location.href = 'html/product.html'; // Navigate to product.html
             });
             productGrid.appendChild(viewMoreButton);
         }
