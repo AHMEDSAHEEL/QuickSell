@@ -1,0 +1,61 @@
+body {
+    background-color: #1a1a2e; /* A deep, dark indigo for a rich background */
+    font-family: 'Roboto', sans-serif;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    max-width: 550px;
+    background-color: #16213e; /* A slightly lighter shade for the container */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    margin-bottom: 20px;
+}
+
+.profile-info h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.profile-picture img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid #ffffff;
+}
+
+.profile-picture input {
+    display: block;
+    margin: 0 auto;
+}
+
+.save-btn {
+    background-color: #e94560; /* A vibrant, eye-catching red for the button */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.save-btn:hover {
+    background-color: #d72335; /* Slightly darker red for the hover effect */
+    transform: scale(1.05);
+}

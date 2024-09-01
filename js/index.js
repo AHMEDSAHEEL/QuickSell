@@ -1,39 +1,59 @@
-const firebaseConfig = {
-    apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
-    authDomain: "quicksell-374b8.firebaseapp.com",
-    projectId: "quicksell-374b8",
-    storageBucket: "quicksell-374b8.appspot.com",
-    messagingSenderId: "984641749083",
-    appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        const userDoc = await db.collection('users').doc(user.uid).get();
-        const isAdmin = userDoc.data().isAdmin;
-        console.log()
-        //  document.getElementById('username').textContent = `Welcome, ${userDoc.data().username}`;
-        
-        if (isAdmin) {
-            document.getElementById('admin-panel').style.display='block';
-        } else {
-            document.getElementById('admin-panel').style.display='none';
-        }
-    } 
-});
-document.getElementById('product-image').addEventListener('change', function() {
-    
-    const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-    document.getElementById('file-name').textContent = fileName;
-});
-
 document.addEventListener('DOMContentLoaded', function() {
+    const firebaseConfig = {
+        apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
+        authDomain: "quicksell-374b8.firebaseapp.com",
+        projectId: "quicksell-374b8",
+        storageBucket: "quicksell-374b8.appspot.com",
+        messagingSenderId: "984641749083",
+        appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    
+    
+    //document.getElementById('userPofile').style.display='none';
+    document.getElementById('sign-in').style.display='none';
+    document.getElementById('user').style.display='none';
+    
+    auth.onAuthStateChanged(async (user) => {
+       
+        if (user) {
+            document.getElementById('user').style.display='block';
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const isAdmin = userDoc.data().isAdmin;
+            console.log()
+            //  document.getElementById('username').textContent = `Welcome, ${userDoc.data().username}`;
+            
+          
+            if (isAdmin) {
+                
+                document.getElementById('admin-panel').style.display='block';
+            } else {
+                document.getElementById('admin-panel').style.display='none';
+            }
+        } 
+        else{
+            document.getElementById('sign-in').style.display='block';
+        }
+    });
+
+    document.getElementById('user').addEventListener('click', () => {
+        window.location.href = '../html/profile.html';
+    });
+    
+    
+    
+    document.getElementById('product-image').addEventListener('change', function() {
+        
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
+    });
+    
+
     const buttons = document.querySelectorAll('#hero button');
     buttons.forEach(button => {
         button.addEventListener('click', function() {
@@ -126,10 +146,14 @@ document.addEventListener('DOMContentLoaded', function() {
             <h3>${name}</h3>
             <p>Price: $${price.toFixed(2)}</p>
             <p class="expiry-timer">Expires in ${expiryDays} days</p>
+            <button class="buy" id="buy">buy</button>
+            <button class="add" id="add">Add</button>  
         `;
         document.getElementById('product-grid').appendChild(newProductCard);
     
         const expiryTimer = newProductCard.querySelector('.expiry-timer');
+        
+        let timerInterval;
     
         function updateTimer() {
             const now = Date.now();
@@ -143,26 +167,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const secondsLeft = Math.floor((timeLeft % (60 * 1000)) / 1000);
     
             // Format the timer text
-            const timerText = `${daysLeft} ${daysLeft !== 1 ? '' : ''}: ${hoursLeft} ${hoursLeft !== 1 ? '' : ''}: ${minutesLeft} ${minutesLeft !== 1 ? '' : ''}: ${secondsLeft} ${secondsLeft !== 1 ? '' : ''}`;
+            const timerText = `${daysLeft}d : ${hoursLeft}h : ${minutesLeft}m : ${secondsLeft}s`;
             expiryTimer.textContent = timerText;
-            //console.log(timerText);
     
             // If expired, remove the product
             if (timeLeft <= 0) {
                 clearInterval(timerInterval); // Stop the interval
                 expiryTimer.textContent = 'Expired'; // Update text to 'Expired'
-                deleteProductFromFirestore(id, imageFileUrl);
+                
                 setTimeout(() => {
                     // Remove the product card from the DOM after the grace period
+                    deleteProductFromFirestore(id, imageFileUrl);
                     newProductCard.remove();
-                }, 100000);
+                }, 1000000);
             }
         }
     
         // Update the timer immediately and then every second
         updateTimer();
-        const timerInterval = setInterval(updateTimer, 1000);
+        timerInterval = setInterval(updateTimer, 1000);
     }
+    
     
     async function deleteProductFromFirestore(productId, imageFileUrl) {
         const productRef = db.collection('products').doc(productId);
@@ -260,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('spinner').style.display='none';
             alert('Product updated/added successfully');
             productForm.reset();
+            document.getElementById('file-name').textContent = 'No file chosen';
         } catch (error) {
             document.getElementById('spinner').style.display='none';
             console.error('Error updating product:', error);
