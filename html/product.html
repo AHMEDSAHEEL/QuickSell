@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Include Firebase and your CSS -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image:  linear-gradient(#13072e, #200b4e);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-image:  linear-gradient(#13072e, #200b4e);
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        main {
+            padding: 1rem;
+        }
+
+        #search-bar {
+            width: 100%;
+            margin: 0 auto 40px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #search-bar:focus {
+            border-color: #13072e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        #products {
+            min-height: 100vh;
+            padding: 50px 20px;
+            background-image: linear-gradient(#13072e, #200b4e);
+            color: white;
+            animation: slideInLeft 1s ease-out forwards;
+            overflow-x: hidden;
+        }
+
+        #products h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .product-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .product-card {
+            color: #13072e;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            width: 25%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px #070017;
+            cursor: pointer;
+        }
+
+        .product-card h3 {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .product-card p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .product-card button {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            margin: 5px;
+        }
+
+        .product-card .buy {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .product-card .buy:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        .product-card .add {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .product-card .add:hover {
+            background-color: #0069d9;
+            transform: scale(1.05);
+        }
+
+        .product-card button:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            .product-card {}
+        }
+
+        @media (max-width: 480px) {
+            .product-card {}
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100vh; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            margin: 50px auto;
+            display: block;
+            max-width: 90%;
+            max-height: 80%;
+        }
+
+        #caption {
+            margin: 15px;
+            text-align: center;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #ddd;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Product Catalog</h1>
+    </header>
+
+    <main id="products">
+        <h2>Our Products</h2>
+        <input type="text" id="search-bar" placeholder="Search by product name">
+        <div class="product-grid" id="product-grid"></div>
+    </main>
+
+    <!-- Full-Size Image Modal -->
+    <div id="image-modal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modal-img">
+        <div id="caption"></div>
+    </div>
+
+    
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
+            authDomain: "quicksell-374b8.firebaseapp.com",
+            projectId: "quicksell-374b8",
+            storageBucket: "quicksell-374b8.appspot.com",
+            messagingSenderId: "984641749083",
+            appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchBar = document.getElementById('search-bar');
+            const productGrid = document.getElementById('product-grid');
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-img');
+            const caption = document.getElementById('caption');
+            const close = document.querySelector('.close');
+
+            async function renderAllProducts() {
+                productGrid.innerHTML = ''; // Clear existing products
+
+                const snapshot = await db.collection('products').get();
+                snapshot.forEach(doc => {
+                    const product = { id: doc.id, ...doc.data() };
+                    renderProductCard(product);
+                });
+            }
+
+            function renderProductCard(product) {
+                const { id, name, price, expiryDays, imageFileUrl, timestamp } = product;
+                const newProductCard = document.createElement('div');
+                newProductCard.classList.add('product-card');
+                newProductCard.setAttribute('data-product-id', id);
+
+                newProductCard.innerHTML = `
+                    <img src="${imageFileUrl}" alt="${name}">
+                    <h3>${name}</h3>
+                    <p>Price: $${price.toFixed(2)}</p>
+                    <p class="expiry-timer">Expires in ${expiryDays} days</p>
+                    <button class="buy" id="buy">Buy</button>
+                    <button class="add" id="add">Add</button>
+                `;
+                productGrid.appendChild(newProductCard);
+
+                // Image click event for the modal
+                newProductCard.querySelector('img').addEventListener('click', () => {
+                    modal.style.display = "block";
+                    modalImg.src = imageFileUrl;
+                    caption.textContent = name;
+                });
+
+                // Animate product card
+                setTimeout(() => {
+                    newProductCard.style.opacity = 1;
+                    newProductCard.style.transform = 'translateX(0)';
+                }, 100); // Delay for animation effect
+            }
+
+            function filterProducts() {
+                const query = searchBar.value.toLowerCase();
+                const productCards = document.querySelectorAll('.product-card');
+
+                productCards.forEach(card => {
+                    const name = card.querySelector('h3').textContent.toLowerCase();
+                    card.style.display = name.includes(query) ? '' : 'none';
+                });
+            }
+
+            searchBar.addEventListener('input', filterProducts);
+
+            // Close modal when user clicks on close button
+            close.addEventListener('click', () => {
+                modal.style.display = "none";
+            });
+
+            // Close modal when user clicks outside of the image
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            // Render all products on page load
+            renderAllProducts();
+        });
+    </script>
+</body>
+
+</html>

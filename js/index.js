@@ -271,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error deleting product:', error);
         }
     }
+  
     const productGrid = document.getElementById('product-grid');
     const loader = document.getElementById('loader');
     db.collection('products').onSnapshot(snapshot => {
@@ -278,10 +279,27 @@ document.addEventListener('DOMContentLoaded', function() {
         productGrid.style.display = 'none';
         productGrid.innerHTML = ''; // Clear existing products
 
+        const product = [];
         snapshot.forEach(doc => {
-            const product = { id: doc.id, ...doc.data() };
-            renderProductCard(product);
+            const prod = { id: doc.id, ...doc.data() };
+            product.push(prod);
         });
+
+        // Render up to 6 products
+        const displayedProducts = product.slice(0, 6);
+        displayedProducts.forEach(product => renderProductCard(product));
+
+        // Add "View More" button if there are more than 6 products
+        if (product.length > 6) {
+            const viewMoreButton = document.createElement('button');
+            viewMoreButton.textContent = 'View More';
+            viewMoreButton.classList.add('view-more');
+            viewMoreButton.addEventListener('click', () => {
+                window.location.href = '../html/product.html'; // Navigate to product.html
+            });
+            productGrid.appendChild(viewMoreButton);
+        }
+
         loader.style.display = 'none';
         productGrid.style.display = 'flex'; 
         const products = document.querySelector('#products');
