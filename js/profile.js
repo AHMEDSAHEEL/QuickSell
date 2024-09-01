@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await auth.signOut();
             // Redirect to login/signup page
-            window.location.href = '../html/loginSignUp.html';
+            window.location.href = 'html/loginSignUp.html';
         } catch (error) {
             console.error('Error logging out:', error);
             alert('Error logging out.');

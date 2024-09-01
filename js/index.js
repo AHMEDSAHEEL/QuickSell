@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('user').addEventListener('click', () => {
-        window.location.href = '../html/profile.html';
+        window.location.href = 'html/profile.html';
     });
     
     
