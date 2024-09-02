@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+ document.addEventListener('DOMContentLoaded', function () {
     const firebaseConfig = {
         apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
         authDomain: "quicksell-374b8.firebaseapp.com",
@@ -25,27 +25,28 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('user').style.display = 'none';
 
     auth.onAuthStateChanged(async (user) => {
-
         if (user) {
             document.getElementById('user').style.display = 'block';
             const userDoc = await db.collection('users').doc(user.uid).get();
             const isAdmin = userDoc.data().isAdmin;
-            console.log()
-            //  document.getElementById('username').textContent = `Welcome, ${userDoc.data().username}`;
-
-
-            if (isAdmin) {
-
-                document.getElementById('admin-panel').style.display = 'block';
-            } else {
-                document.getElementById('admin-panel').style.display = 'none';
-            }
-        }
-        else {
+    
+            document.getElementById('admin-panel').style.display = isAdmin ? 'block' : 'none';
+    
+            // Update visibility of delete buttons
+            document.querySelectorAll('.delete').forEach(button => {
+                button.style.display = isAdmin ? 'inline-block' : 'none';
+            });
+    
+        } else {
             document.getElementById('sign-in').style.display = 'block';
+            
+            // Hide all delete buttons if not logged in
+            document.querySelectorAll('.delete').forEach(button => {
+                button.style.display = 'none';
+            });
         }
     });
-
+    
     document.getElementById('user').addEventListener('click', () => {
         window.location.href = 'html/profile.html';
     });
@@ -146,27 +147,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function uploadImage(file, oldImageUrl) {
         if (!file) return oldImageUrl;
-
+    
         const storageRef = storage.ref();
-        const newImageRef = storageRef.child(`images/${file.name}`);
-
+        const uniqueFileName = `${Date.now()}_${file.name}`; // Use timestamp or UUID for uniqueness
+        const newImageRef = storageRef.child(`images/${uniqueFileName}`);
+    
         // If there is an old image URL, delete the old image
         if (oldImageUrl) {
             const oldImagePath = decodeURIComponent(oldImageUrl.split('/o/')[1].split('?')[0]);
             const oldImageRef = storageRef.child(oldImagePath);
-
+    
             try {
                 await oldImageRef.delete();
             } catch (error) {
                 console.log("Old image deletion error:", error);
             }
         }
-
+    
         // Upload the new image
         await newImageRef.put(file);
         return newImageRef.getDownloadURL();
     }
-
+    
     async function saveProductToFirestore(productId, name, price, expiryDays, imageFile) {
         const productRef = db.collection('products').doc(productId);
         const productDoc = await productRef.get();
@@ -198,12 +200,22 @@ document.addEventListener('DOMContentLoaded', function () {
             <p class="expiry-timer">Expires in ${expiryDays} days</p>
             <button class="buy" id="buy">buy</button>
             <button class="add" id="add">Add</button>  
+           <button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button> 
         `;
         document.getElementById('product-grid').appendChild(newProductCard);
         newProductCard.querySelector('img').addEventListener('click', () => {
             modal.style.display = "block";
             modalImg.src = imageFileUrl;
             caption.textContent = name;
+        });
+        newProductCard.querySelector('.delete').addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const imageUrl = this.getAttribute('data-image-url');
+            const confirmDelete = confirm("Are you sure you want to delete this product?");
+            
+            if (confirmDelete) {
+                deleteProductFromFirestore(productId, imageUrl);
+            }
         });
         const expiryTimer = newProductCard.querySelector('.expiry-timer');
 
@@ -223,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Format the timer text
             const timerText = `${daysLeft}d : ${hoursLeft}h : ${minutesLeft}m : ${secondsLeft}s`;
             expiryTimer.textContent = timerText;
-
+          
             // If expired, remove the product
             if (timeLeft <= 0) {
                 clearInterval(timerInterval); // Stop the interval
@@ -233,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Remove the product card from the DOM after the grace period
                     deleteProductFromFirestore(id, imageFileUrl);
                     newProductCard.remove();
-                }, 100000);
+                }, 10000);
             }
         }
 
@@ -242,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
         timerInterval = setInterval(updateTimer, 1000);
     }
 
-
+ 
     async function deleteProductFromFirestore(productId, imageFileUrl) {
         const productRef = db.collection('products').doc(productId);
 
@@ -297,18 +309,32 @@ document.addEventListener('DOMContentLoaded', function () {
         // Render up to 6 products
         const displayedProducts = product.slice(0, 6);
         displayedProducts.forEach(product => renderProductCard(product));
-
-        // Add "View More" button if there are more than 6 products
-        if (product.length > 6) {
-            const viewMoreButton = document.createElement('button');
-            viewMoreButton.textContent = 'View More';
-            viewMoreButton.classList.add('view-more');
-            viewMoreButton.addEventListener('click', () => {
-                window.location.href = 'html/product.html'; // Navigate to product.html
-            });
-            // Append to main section instead of product grid
-            productGrid.parentNode.appendChild(viewMoreButton);
+        
+        // Function to add or remove the "View More" button
+        function updateViewMoreButton() {
+            const existingViewMoreButton = document.querySelector('.view-more');
+            
+            if (product.length > 6) {
+                if (!existingViewMoreButton) {
+                    const viewMoreButton = document.createElement('button');
+                    viewMoreButton.textContent = 'View More';
+                    viewMoreButton.classList.add('view-more');
+                    viewMoreButton.addEventListener('click', () => {
+                        window.location.href = 'html/product.html'; // Navigate to product.html
+                    });
+                    // Append to main section instead of product grid
+                    productGrid.parentNode.appendChild(viewMoreButton);
+                }
+            } else if (existingViewMoreButton) {
+                existingViewMoreButton.remove(); // Remove button if no longer needed
+            }
         }
+        
+        // Initial call to update the "View More" button
+        updateViewMoreButton();
+        
+        // Listen for changes (e.g., product deletion) and update button accordingly
+        // You should call `updateViewMoreButton()` after any operation that changes the number of products
         
 
         loader.style.display = 'none';

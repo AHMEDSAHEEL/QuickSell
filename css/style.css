@@ -202,7 +202,7 @@ li:hover{
 
 .product-grid {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     flex-wrap: wrap;
     
 }
@@ -213,7 +213,7 @@ li:hover{
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 20px;
-    width: 25%;
+    width: 20%;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     margin: 20px;
     text-align: center;
@@ -222,9 +222,11 @@ li:hover{
     transition: opacity 1.5s ease, transform 1.5s ease;
 }
 
+
+
 .product-card img {
     width: 85%;
-    height: 300px;
+    height: 250px;
     border-radius: 5px;
     margin-bottom: 15px;
     box-shadow: 0 4px 10px #070017;
@@ -273,6 +275,17 @@ li:hover{
     background-color: #0069d9;
     transform: scale(1.05);
 }
+.product-card .delete {
+    
+    background-color:red;
+    color: white;
+}
+
+.product-card .delete:hover {
+    background-color: #cb4949;
+    transform: scale(1.05);
+}
+
 
 .product-card button:active {
     transform: scale(0.95);

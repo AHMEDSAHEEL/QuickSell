@@ -13,6 +13,9 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+
+
+
 /* Animation for container */
 document.getElementById('show-signup').addEventListener('click', function() {
     document.getElementById('signup-container').style.display = 'block';
@@ -73,33 +76,32 @@ document.getElementById('login-form').addEventListener('submit', async function(
     showSpinner('login-spinner');
 
     try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        // Log in the user
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        // Check if user is an admin
-        const userDoc = await db.collection('users').doc(user.uid).get();
-        const isAdmin = userDoc.data().isAdmin;
+        // Get the user's role from Firestore
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+            const role = userDoc.data().role;
+            
+            // Show success message and update emoji
+            setTimeout(() => {
+                document.getElementById('emoji-icon').textContent = "👫";
+                success.style.display = "block";
+                success.textContent = "Login Successfully";
+                document.getElementById('welcome').style.display = "none";
+            }, 2000);
 
-        if (isAdmin) {
-            alert('You are an admin');
+            // Redirect based on user role
+            setTimeout(() => {
+                hideSpinner('login-spinner');
+                redirectToDashboard(role);
+                document.getElementById('login-form').reset();
+            }, 3500);
         } else {
-            alert('You are a regular user');
+            throw new Error('No such document!');
         }
-
-        setTimeout(() => {
-            document.getElementById('emoji-icon').textContent = "👫";
-            success.style.display = "block";
-            success.textContent = "Login Successfully";
-            document.getElementById('welcome').style.display = "none";
-        }, 2000);
-
-        setTimeout(function() {
-            success.style.display = "none";
-            document.getElementById('welcome').style.display = "block";
-            window.location.href = "../index.html";
-            hideSpinner('login-spinner');
-            document.getElementById('login-form').reset();
-        }, 3500);
     } catch (error) {
         setTimeout(function() {
             document.getElementById('welcome').style.display = "none";
@@ -111,6 +113,26 @@ document.getElementById('login-form').addEventListener('submit', async function(
     }
 });
 
+function redirectToDashboard(role) {
+    switch (role) {
+        case 'Admin':
+            window.location.href = '../index.html';
+            alert('Login as admin');
+            break;
+        case 'Vendor':
+            window.location.href = '../index.html';
+            alert('Login as Vendor');
+            break;
+        case 'User':
+            window.location.href = '../index.html';
+            alert('Login as User');
+            break;
+        default:
+            alert('No access in Login');
+            break;
+    }
+}
+
 // Signup form submission
 document.getElementById('signup-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -118,14 +140,17 @@ document.getElementById('signup-form').addEventListener('submit', async function
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     const mobile = document.getElementById('signup-mobile').value; // Fix ID for mobile input
-
+    const role=document.getElementById('roleSelect').value;
     showSpinner('signup-spinner');
 
     try {
         // Check for existing email
+        console.log(1)
         const userQuery = await db.collection('users').where('email', '==', email).get();
+        console.log(2);
         if (!userQuery.empty) {
-            alert("email alreay exixts");
+            alert("Email already exists");
+            throw new Error("Email already exists"); // To ensure that the code execution stops here
         }
 
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
@@ -137,7 +162,8 @@ document.getElementById('signup-form').addEventListener('submit', async function
             email: email,
             password: password,
             mobile: mobile,
-            isAdmin: false // Set to true if needed
+            isAdmin: false ,
+            role: role// Set to true if needed
         });
 
         document.getElementById('signup-emoji-icon').textContent = "👫";
