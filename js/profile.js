@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const storageRef = firebase.storage().ref();
             const profilePicRef = storageRef.child(`profilePictures/${user.uid}/${file.name}`);
 
-            loader.style.display = 'block';
+           loader.style.display = 'block';
 
             try {
                 // Retrieve current user profile image URL

@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const firebaseConfig = {
         apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
         authDomain: "quicksell-374b8.firebaseapp.com",
@@ -7,57 +7,62 @@ document.addEventListener('DOMContentLoaded', function() {
         messagingSenderId: "984641749083",
         appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
     };
-    
+
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
-    
-    
+
+
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-img');
+    const caption = document.getElementById('caption');
+    const close = document.querySelector('.close');
+
     //document.getElementById('userPofile').style.display='none';
-    document.getElementById('sign-in').style.display='none';
-    document.getElementById('user').style.display='none';
-    
+    document.getElementById('sign-in').style.display = 'none';
+    document.getElementById('user').style.display = 'none';
+
     auth.onAuthStateChanged(async (user) => {
-       
+
         if (user) {
-            document.getElementById('user').style.display='block';
+            document.getElementById('user').style.display = 'block';
             const userDoc = await db.collection('users').doc(user.uid).get();
             const isAdmin = userDoc.data().isAdmin;
             console.log()
             //  document.getElementById('username').textContent = `Welcome, ${userDoc.data().username}`;
-            
-          
+
+
             if (isAdmin) {
-                
-                document.getElementById('admin-panel').style.display='block';
+
+                document.getElementById('admin-panel').style.display = 'block';
             } else {
-                document.getElementById('admin-panel').style.display='none';
+                document.getElementById('admin-panel').style.display = 'none';
             }
-        } 
-        else{
-            document.getElementById('sign-in').style.display='block';
+        }
+        else {
+            document.getElementById('sign-in').style.display = 'block';
         }
     });
 
     document.getElementById('user').addEventListener('click', () => {
         window.location.href = 'html/profile.html';
     });
-    
+
     // Example function to get the user's profile picture URL after login
     function updateProfilePictureFromFirestore() {
         const user = firebase.auth().currentUser;
-    
+
         if (user) {
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(user.uid);
-    
+
             userRef.get().then((doc) => {
                 if (doc.exists) {
                     const userData = doc.data();
                     const profilePicUrl = userData.profileImageUrl; // Assuming you store the URL under `profileImageUrl`
-    
+
                     if (profilePicUrl) {
                         // Update the profile picture in the index page
                         const profilePictureElement = document.getElementById('userProfile');
@@ -80,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("No authenticated user found.");
         }
     }
-    
+
     // Call this function after login
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
@@ -90,18 +95,18 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("No user signed in.");
         }
     });
-    
-    
-    document.getElementById('product-image').addEventListener('change', function() {
-        
+
+
+    document.getElementById('product-image').addEventListener('change', function () {
+
         const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
         document.getElementById('file-name').textContent = fileName;
     });
-    
+
 
     const buttons = document.querySelectorAll('#hero button');
     buttons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             alert(`Button clicked: ${this.textContent}`);
         });
     });
@@ -185,75 +190,79 @@ document.addEventListener('DOMContentLoaded', function() {
         const newProductCard = document.createElement('div');
         newProductCard.classList.add('product-card');
         newProductCard.setAttribute('data-product-id', id);
-    
+
         newProductCard.innerHTML = `
             <img src="${imageFileUrl}" alt="${name}">
             <h3>${name}</h3>
-            <p>Price: $${price.toFixed(2)}</p>
+            <p>Price: ₹${price.toFixed(2)}</p>
             <p class="expiry-timer">Expires in ${expiryDays} days</p>
             <button class="buy" id="buy">buy</button>
             <button class="add" id="add">Add</button>  
         `;
         document.getElementById('product-grid').appendChild(newProductCard);
-    
+        newProductCard.querySelector('img').addEventListener('click', () => {
+            modal.style.display = "block";
+            modalImg.src = imageFileUrl;
+            caption.textContent = name;
+        });
         const expiryTimer = newProductCard.querySelector('.expiry-timer');
-        
+
         let timerInterval;
-    
+
         function updateTimer() {
             const now = Date.now();
             const expiryDate = new Date(timestamp + expiryDays * 24 * 60 * 60 * 1000);
             const timeLeft = expiryDate - now;
-    
+
             // Calculate days, hours, minutes, and seconds
             const daysLeft = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
             const hoursLeft = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
             const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
             const secondsLeft = Math.floor((timeLeft % (60 * 1000)) / 1000);
-    
+
             // Format the timer text
             const timerText = `${daysLeft}d : ${hoursLeft}h : ${minutesLeft}m : ${secondsLeft}s`;
             expiryTimer.textContent = timerText;
-    
+
             // If expired, remove the product
             if (timeLeft <= 0) {
                 clearInterval(timerInterval); // Stop the interval
                 expiryTimer.textContent = 'Expired'; // Update text to 'Expired'
-                
+
                 setTimeout(() => {
                     // Remove the product card from the DOM after the grace period
                     deleteProductFromFirestore(id, imageFileUrl);
                     newProductCard.remove();
-                }, 10000);
+                }, 100000);
             }
         }
-    
+
         // Update the timer immediately and then every second
         updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
     }
-    
-    
+
+
     async function deleteProductFromFirestore(productId, imageFileUrl) {
         const productRef = db.collection('products').doc(productId);
-    
+
         try {
             // Delete product document
             await productRef.delete();
             console.log(`Product ${productId} deleted successfully`);
-    
+
             if (imageFileUrl) {
                 // Decode and clean the URL to extract the correct path
                 const imagePath = decodeURIComponent(imageFileUrl.split('/o/')[1].split('?')[0]);
                 console.log("Attempting to delete image at path:", imagePath);
-    
+
                 const imageRef = storage.ref().child(imagePath);
-    
+
                 try {
                     // Check if the file exists
-                    await imageRef.getDownloadURL(); 
+                    await imageRef.getDownloadURL();
                     console.log(`Image at ${imagePath} exists, proceeding to delete`);
-                    
+
                     // Delete the image
                     await imageRef.delete();
                     console.log(`Image at ${imagePath} deleted successfully`);
@@ -271,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error deleting product:', error);
         }
     }
-  
+
     const productGrid = document.getElementById('product-grid');
     const loader = document.getElementById('loader');
     db.collection('products').onSnapshot(snapshot => {
@@ -297,11 +306,13 @@ document.addEventListener('DOMContentLoaded', function() {
             viewMoreButton.addEventListener('click', () => {
                 window.location.href = 'html/product.html'; // Navigate to product.html
             });
-            productGrid.appendChild(viewMoreButton);
+            // Append to main section instead of product grid
+            productGrid.parentNode.appendChild(viewMoreButton);
         }
+        
 
         loader.style.display = 'none';
-        productGrid.style.display = 'flex'; 
+        productGrid.style.display = 'flex';
         const products = document.querySelector('#products');
         const productsObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -318,40 +329,52 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }, { threshold: 0.1 });
         productsObserver.observe(products);
-    
+
     });
 
     const productForm = document.getElementById('product-form');
 
-    productForm.addEventListener('submit', async function(e) {
+    productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
-        document.getElementById('spinner').style.display='block';
+
+        document.getElementById('spinner').style.display = 'block';
         const productId = document.getElementById('product-id').value.trim();
         const name = document.getElementById('product-name').value.trim();
         const price = parseFloat(document.getElementById('product-price').value);
         const expiryDays = parseInt(document.getElementById('expiry-days').value, 10);
         const imageFile = document.getElementById('product-image').files[0];
         console.log('Form submitted with:', { productId, name, price, expiryDays, imageFile });
-        
+
         if (!productId || isNaN(price) || isNaN(expiryDays)) {
             document.getElementById('spinner').style.display = 'none';
             alert('Please fill out all fields correctly and upload an image.');
             console.error('Invalid input values');
             return;
         }
-        
-       
+
+
 
         try {
             await saveProductToFirestore(productId, name, price, expiryDays, imageFile);
-            document.getElementById('spinner').style.display='none';
+            document.getElementById('spinner').style.display = 'none';
             alert('Product updated/added successfully');
             productForm.reset();
             document.getElementById('file-name').textContent = 'No file chosen';
         } catch (error) {
-            document.getElementById('spinner').style.display='none';
+            document.getElementById('spinner').style.display = 'none';
             console.error('Error updating product:', error);
         }
     });
+    // Close modal when user clicks on close button
+    close.addEventListener('click', () => {
+        modal.style.display = "none";
+    });
+
+    // Close modal when user clicks outside of the image
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
 });
