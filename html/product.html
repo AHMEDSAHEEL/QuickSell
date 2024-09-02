@@ -236,7 +236,7 @@
         }
 
         .product-card .delete {
-
+            display: none;
             background-color: red;
             color: white;
         }
@@ -308,24 +308,59 @@
             const caption = document.getElementById('caption');
             const close = document.querySelector('.close');
 
-
-
             auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    //document.getElementById('user').style.display = 'block';
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    //const isAdmin = userDoc.data().isAdmin;
-                    const role = userDoc.data().role;
-                    console.log(role);
-                    //document.getElementById('admin-panel').style.display = (role==='Admin' || role === 'Vendor') ? 'block' : 'none';
 
-                    // Update visibility of delete buttons
-                    document.querySelectorAll('.delete').forEach(button => {
+            if (user) {
+            //document.getElementById('user').style.display = 'block';
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const role = userDoc.data().role;
+            console.log(role);
+            console.log(user.uid);
 
-                        button.style.display = (role === 'Admin' || role === 'Vendor') ? 'inline-block' : 'none';
+            if (role === 'Admin') {
+                // Admins can delete any product
+                console.log(1);
+                document.querySelectorAll('.delete').forEach(button => {
+                    button.style.display = 'inline-block';
+                });
+            }
+            
+            if (role === 'Vendor') {
+                console.log(role);
+            
+                try {
+                    const productsSnapshot = await db.collection('products').where('vendorId', '==', user.uid).get();
+                    console.log('Query executed');
+            
+                    if (productsSnapshot.empty) {
+                        console.log('No matching products.');
+                        return;
+                    }
+            
+                    productsSnapshot.forEach(doc => {
+                        console.log('Product found:', doc.id);
+                        const deleteButton = document.querySelector(`[data-product-id="${doc.id}"] .delete`);
+                        console.log(deleteButton)
+                        if (deleteButton) {
+                            deleteButton.style.display = 'inline-block';
+                        }
+                        else{
+                            console.log('not')
+                        }
+                        // document.querySelectorAll('.products').forEach(card => {
+                        //     const vendorId = card.getAttribute('data-vendor-id'); // Assuming each product card has this attribute
+                        //     console.log(vendorId)
+                        //     if (user.uid !== vendorId && role !== 'Admin') {
+                        //         card.querySelector('.delete').style.display = 'none';
+                        //     }
+                        // });
                     });
-
-                } else {
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                }
+            }
+            
+        }else {
                     document.getElementById('sign-in').style.display = 'block';
 
                     // Hide all delete buttons if not logged in
@@ -334,6 +369,7 @@
                     });
                 }
             });
+    
 
             // document.getElementById('user').addEventListener('click', () => {
             //     window.location.href = 'html/profile.html';

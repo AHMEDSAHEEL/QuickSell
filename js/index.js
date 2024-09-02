@@ -23,22 +23,64 @@
     //document.getElementById('userPofile').style.display='none';
     document.getElementById('sign-in').style.display = 'none';
     document.getElementById('user').style.display = 'none';
-
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             document.getElementById('user').style.display = 'block';
             const userDoc = await db.collection('users').doc(user.uid).get();
-            //const isAdmin = userDoc.data().isAdmin;
-             const role =userDoc.data().role;
-             console.log(role);
-            document.getElementById('admin-panel').style.display = (role==='Admin' || role === 'Vendor') ? 'block' : 'none';
+            const role = userDoc.data().role;
+            console.log(role);
+            console.log(user.uid);
+            document.getElementById('admin-panel').style.display = (role === 'Admin' || role === 'Vendor') ? 'block' : 'none';
     
-            // Update visibility of delete buttons
-            document.querySelectorAll('.delete').forEach(button => {
-                
-                button.style.display = (role==='Admin' || role === 'Vendor') ? 'inline-block' : 'none';
-            });
-    
+          //  Update visibility of delete buttons
+            if (role === 'Admin') {
+                // Admins can delete any product
+                console.log(1);
+                document.querySelectorAll('.delete').forEach(button => {
+                    button.style.display = 'inline-block';
+                });
+            }
+            
+            if (role === 'Vendor') {
+                console.log(role);
+            
+                try {
+                    const productsSnapshot = await db.collection('products').where('vendorId', '==', user.uid).get();
+                    console.log('Query executed');
+            
+                    if (productsSnapshot.empty) {
+                        console.log('No matching products.');
+                        return;
+                    }
+            
+                    productsSnapshot.forEach(doc => {
+                        console.log('Product found:', doc.id);
+                        const deleteButton = document.querySelector(`[data-product-id="${doc.id}"] .delete`);
+                        console.log(deleteButton)
+                        if (deleteButton) {
+                            deleteButton.style.display = 'inline-block';
+                        }
+                        else{
+                            console.log('not')
+                        }
+                        // document.querySelectorAll('.products').forEach(card => {
+                        //     const vendorId = card.getAttribute('data-vendor-id'); // Assuming each product card has this attribute
+                        //     console.log(vendorId)
+                        //     if (user.uid !== vendorId && role !== 'Admin') {
+                        //         card.querySelector('.delete').style.display = 'none';
+                        //     }
+                        // });
+                    });
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                }
+            }
+            
+            
+        
+            // Hide delete buttons for other vendors' products
+           
+            
         } else {
             document.getElementById('sign-in').style.display = 'block';
             
@@ -47,7 +89,16 @@
                 button.style.display = 'none';
             });
         }
+    
+        // Helper function to check if the user is an admin (not currently used but kept for future use)
+        // async function isAdmin(userId) {
+        //     const userDoc = await db.collection('users').doc(userId).get();
+        //     return userDoc.data().role === 'Admin';
+        // }
+
     });
+     
+  
     
     document.getElementById('user').addEventListener('click', () => {
         window.location.href = 'html/profile.html';
@@ -172,22 +223,37 @@
     }
     
     async function saveProductToFirestore(productId, name, price, expiryDays, imageFile) {
-        const productRef = db.collection('products').doc(productId);
-        const productDoc = await productRef.get();
-        const productData = productDoc.data();
-
-        const imageUrl = await uploadImage(imageFile, productData ? productData.imageFileUrl : null);
-
-        const updatedProductData = {
-            name,
-            price,
-            expiryDays,
-            imageFileUrl: imageUrl || '../images/product.png',
-            timestamp: Date.now() // Store the current timestamp
-        };
-
-        return productRef.set(updatedProductData, { merge: true });
+        try {
+            const productRef = db.collection('products').doc(productId);
+            const user = auth.currentUser; // Get the current user
+    
+            // Fetch the user's document
+            const userDoc = await db.collection('users').doc(user.uid).get();
+    
+            // Upload image or use existing URL
+            const imageUrl = await uploadImage(imageFile);
+    
+            // Prepare the updated product data
+            const updatedProductData = {
+                name,
+                price,
+                expiryDays,
+                vendorId: user.uid,
+                email: userDoc.data().email,
+                user_id: user.uid,
+                imageFileUrl: imageUrl || '../images/product.png',
+                timestamp: Date.now() // Store the current timestamp
+            };
+    
+            // Save the product data to Firestore with merging
+            await productRef.set(updatedProductData, { merge: true });
+    
+            console.log('Product saved successfully');
+        } catch (error) {
+            console.error('Error saving product:', error);
+        }
     }
+    
 
     function renderProductCard(product) {
         const { id, name, price, expiryDays, imageFileUrl, timestamp } = product;
@@ -256,12 +322,22 @@
         timerInterval = setInterval(updateTimer, 1000);
     }
 
- 
+    function logAction(userId, actionType, resourceId,email) {
+        db.collection('auditLogs').add({
+            userId,
+            actionType,
+            resourceId,
+            email,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
     async function deleteProductFromFirestore(productId, imageFileUrl) {
         const productRef = db.collection('products').doc(productId);
 
         try {
             // Delete product document
+            const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+            logAction(auth.currentUser.uid, 'delete', productId,userDoc.data().email);
             await productRef.delete();
             console.log(`Product ${productId} deleted successfully`);
 
