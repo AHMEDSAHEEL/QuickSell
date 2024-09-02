@@ -28,13 +28,15 @@
         if (user) {
             document.getElementById('user').style.display = 'block';
             const userDoc = await db.collection('users').doc(user.uid).get();
-            const isAdmin = userDoc.data().isAdmin;
-    
-            document.getElementById('admin-panel').style.display = isAdmin ? 'block' : 'none';
+            //const isAdmin = userDoc.data().isAdmin;
+             const role =userDoc.data().role;
+             console.log(role);
+            document.getElementById('admin-panel').style.display = (role==='Admin' || role === 'Vendor') ? 'block' : 'none';
     
             // Update visibility of delete buttons
             document.querySelectorAll('.delete').forEach(button => {
-                button.style.display = isAdmin ? 'inline-block' : 'none';
+                
+                button.style.display = (role==='Admin' || role === 'Vendor') ? 'inline-block' : 'none';
             });
     
         } else {

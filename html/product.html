@@ -46,10 +46,10 @@
             width: 100%;
             max-width: 100vp;
             margin: 0 auto 40px;
-            padding: 20px 20px;
+            padding: 20px;
             border: 1px solid #ddd;
             border-radius: 30px;
-            font-size: 18px;
+            font-size: 1.2rem;
             color: #333;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -69,7 +69,7 @@
             color: white;
             animation: slideInLeft 1s ease-out forwards;
             overflow-x: hidden;
-            
+
         }
 
         #products h2 {
@@ -79,24 +79,25 @@
         }
 
         .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-}
-.product-card {
-    background-color: white;
-    color: black;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    width: 100%;
-    
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    opacity: 0;
-    transform: translateX(100%);
-    transition: opacity 1.5s ease, transform 1.5s ease;
-}
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background-color: white;
+            color: black;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
 
         .product-card img {
             width: 100%;
@@ -159,20 +160,18 @@
         }
 
         @media (max-width: 768px) {
-            .product-card {
-                width: 100%;
-                max-width: 500px;
+
+            #search-bar {
+                font-size: 2.5rem;
             }
         }
 
         @media (max-width: 480px) {
-            .product-card {
-                width: 100%;
-            }
+
 
             #search-bar {
                 padding: 10px 15px;
-                font-size: 16px;
+                font-size: .5rem;
             }
         }
 
@@ -246,22 +245,23 @@
             background-color: #cb4949;
             transform: scale(1.05);
         }
+
         /* Add this to your CSS file or within a <style> tag */
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-}
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
 
-.fade-out {
-    animation: fadeOut 0.5s forwards;
-}
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
 
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
     </style>
 </head>
 
@@ -312,19 +312,21 @@
 
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
-                    // document.getElementById('user').style.display = 'block';
+                    //document.getElementById('user').style.display = 'block';
                     const userDoc = await db.collection('users').doc(user.uid).get();
-                    const isAdmin = userDoc.data().isAdmin;
-
-                    //        document.getElementById('admin-panel').style.display = isAdmin ? 'block' : 'none';
+                    //const isAdmin = userDoc.data().isAdmin;
+                    const role = userDoc.data().role;
+                    console.log(role);
+                    //document.getElementById('admin-panel').style.display = (role==='Admin' || role === 'Vendor') ? 'block' : 'none';
 
                     // Update visibility of delete buttons
                     document.querySelectorAll('.delete').forEach(button => {
-                        button.style.display = isAdmin ? 'inline-block' : 'none';
+
+                        button.style.display = (role === 'Admin' || role === 'Vendor') ? 'inline-block' : 'none';
                     });
 
                 } else {
-                    // document.getElementById('sign-in').style.display = 'block';
+                    document.getElementById('sign-in').style.display = 'block';
 
                     // Hide all delete buttons if not logged in
                     document.querySelectorAll('.delete').forEach(button => {
