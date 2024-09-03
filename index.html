@@ -12,10 +12,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 </head>
 
-<!-- Header -->
-
 <body>
 
+    <!-- Header -->
     <header>
         <div class="logo"><img src="images/quicSell_Q_logo.png" alt="logo"></div>
         <div class="hamburger" id="hamburger">
@@ -35,7 +34,6 @@
         <div class="userProfile" id="user">
             <img src="images/user.png" alt="👤" id="userProfile">
         </div>
-        
     </header>
 
     <div id="hero">
@@ -66,31 +64,48 @@
         </div>
     </div>
 
-    <div id="products" data-product-id="12345" data-vendor-id="67890">
+    <div id="products">
         <h2>Products</h2>
         <div id="loader" class="loader"></div>
         <div id="product-grid" class="product-grid">
-
-            <!-- <div class="product-card" data-product-id="1">
-                    <img src="images/product.png" alt="Product 1">
-                    <h3>Product 1</h3>
-                    <p>Discounted Price: $5.99</p>
-                    <p>Expires in 2 days</p>
-                </div> -->
-            <!-- Add more product cards here with unique data-product-id attributes -->
-            <!-- <button class="delete" style="display: none;">Delete</button> -->
+            <!-- Product cards will be dynamically inserted here -->
         </div>
     </div>
+
     <div id="image-modal" class="modal">
         <span class="close">&times;</span>
-        <img class="modal-content" id="modal-img">
+        <img class="modal-content" id="modal-img" alt="model">
         <div id="caption"></div>
     </div>
 
+    <!-- Vendor Management Section -->
+
+    <div id="vendors">
+        <h2 class="h2-vendorList" id="h2-vendorList">Vendors</h2>
+        <div id="vendor-grid" class="vendor-grid">
+            <!-- Vendor cards will be dynamically inserted here -->
+        </div>
+    </div>
+    <div id="vendor-form-container">
+        <h2 id="edit-AddvendorH1">Add Vendor</h2>
+        <form id="vendor-form">
+            <input type="text" id="vendor-name" placeholder="Vendor Name" required>
+            <input type="text" id="shop-address" placeholder="Shop Address" required>
+            <input type="tel" id="mobile-number" placeholder="Mobile Number" required>
+            <label for="vendor-image" id="custom-vendor-file-label" tabindex="0">Choose an Image</label>
+            <input type="file" id="vendor-image" name="vendorImage" accept="image/*" required>
+            <p id="vendor-file-name">No file chosen</p>
+            <div id="vendor-spinner" class="spinner hidden"></div>
+          
+            <button type="submit">Add Vendor</button>
+        </form>
+        <p id="vendor-message"></p>
+    </div>
 
     <!-- Admin Panel (CRUD Operations) -->
     <div id="admin-panel" class="admin-panel">
         <h2>Admin Panel</h2>
+
         <form id="product-form">
             <input type="number" id="product-id" placeholder="Product ID" required>
             <input type="text" id="product-name" placeholder="Product Name" required>
@@ -104,7 +119,6 @@
         </form>
     </div>
 
-
     <footer id="contact">
         <p>&copy; 2024 Expiring Products. All rights reserved.</p>
         <div class="footer-links">
@@ -114,6 +128,7 @@
             <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">Instagram</a>
         </div>
     </footer>
+
     <script src="js/index.js"></script>
 </body>
 
