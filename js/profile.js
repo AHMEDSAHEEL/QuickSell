@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (userDoc.exists) {
                 const userData = userDoc.data();
                 document.getElementById('username').textContent = userData.username || 'User';
+                document.getElementById('user-mobile').textContent = userData.mobile || 'User';
+                document.getElementById('user-email').textContent = userData.email|| 'User';
                 const profilePicture = document.getElementById('profile-picture');
                 if (userData.profileImageUrl) {
                     profilePicture.src = userData.profileImageUrl;

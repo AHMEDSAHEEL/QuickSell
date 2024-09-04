@@ -204,7 +204,7 @@ li:hover{
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
-    
+
 }
 
 .product-card {
@@ -401,33 +401,43 @@ li:hover{
 #vendors {
     padding: 20px;
     
-    color: white;
+    color: white; 
+    
+    
+        
+    
 }
 
-#vendor-grid {
-    display: flex;
+.vendor-grid {
+    /* display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 20px; */
+    
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+
 }
 
 .vendor-card {
-    width: 20%;
+    background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
     overflow: hidden;
     padding: 10px;
     text-align: center;
-    
-    color:white;
+    cursor: pointer;
+    color:black;
     position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 85%;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     opacity: 0; /* Start hidden */
     transform: translateY(20px);
-      animation: fadeInUp 0.5s ease-out;
+      animation: fadeInUp 1s ease-out;
     animation-fill-mode: forwards;
 }
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -445,13 +455,14 @@ li:hover{
 
 @media (max-width: 768px) {
     .vendor-card {
-        width: 45%; /* Adjust width to fit more cards per row */
+         /* Adjust width to fit more cards per row */
+         width: 90%;
         margin-bottom: 20px; /* Add some margin at the bottom for spacing */
     }
 }
 @media (max-width: 580px) {
     .vendor-card {
-        width: 100%; /* Full width on small screens */
+        width: 93%; /* Full width on small screens */
         margin-bottom: 20px; /* Add some margin at the bottom for spacing */
     }
 }
@@ -460,6 +471,10 @@ li:hover{
     width: 100%;
     height: 250px;
     border-radius: 5px;
+    transition: transform 0.5s ease;
+}
+.vendor-card img:hover{
+    transform: scale(1.03);
 }
 
 .vendor-card h3 {
@@ -467,7 +482,7 @@ li:hover{
 }
 
 .vendor-card p {
-    margin: 5px 0;
+    margin: 10px 5px;
 }
 .edit-delete-container{
     display: flex;
@@ -482,7 +497,7 @@ li:hover{
     background: #ff5722;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 10px 20px;
     border-radius: 3px;
     cursor: pointer;
     transition: background 0.3s ease;
@@ -505,6 +520,11 @@ li:hover{
 .vendor-edit-cancel{
     display: none;
 }
+
+
+
+
+/* Admin Panel */
 /* Admin Panel Styles */
 .admin-panel {
     display: none;
@@ -600,7 +620,7 @@ footer {
 @media (max-width: 1200px) {
     .step,
     .product-card {
-        width: 45%;
+        width: 30%;
     }
 }
 
@@ -616,7 +636,7 @@ footer {
 
     .step,
     .product-card {
-        width: 80%;
+        width: 35%;
     }
 
     .search-bar input {

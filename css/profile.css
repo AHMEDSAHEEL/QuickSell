@@ -1,52 +1,136 @@
 body {
-    background-color: #1a1a2e; /* A deep, dark indigo for a rich background */
+    background-image: linear-gradient(#13072e,#3f2182,#0f0328);
     font-family: 'Roboto', sans-serif;
-    color: #ffffff;
+    color: #333;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.container {
-    max-width: 550px;
-    background-color: #16213e; /* A slightly lighter shade for the container */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
-    text-align: center;
+    min-height: 100vh;
 }
 
 .header {
-    margin-bottom: 20px;
+    background-color:#13072e;
+    color: white;
+    padding: 10px 10px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+
 }
 
-.profile-info {
-    margin-bottom: 20px;
-}
-
-.profile-info h2 {
+.header h1 {
     font-size: 1.5rem;
-    margin-bottom: 10px;
+}
+
+.container {
+    
+    max-width: 1200px;
+    margin: 20px auto;
+    
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    
+}
+
+.profile-sidebar {
+    margin: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-sidebar h2 {
+    align-items: center;
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 20px;
+}
+
+.profile-picture {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .profile-picture img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     margin-bottom: 10px;
-    border: 2px solid #ffffff;
 }
 
-.profile-picture input {
-    display: block;
+.profile-detail {
+    display: flex;
     margin: 0 auto;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 1rem;
+    margin: 10px;
+    padding: 10px;
+    text-align: justify;
 }
 
-.save-btn {
-    background-color: #e94560; /* A vibrant, eye-catching red for the button */
+.profile-detail i {
+    margin-right: 10px;
+    color: #007bff;
+    font-size: 1.2rem;
+}
+
+.custom-file-upload {
+    display: block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    margin: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #007bff;
+}
+
+.section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.section ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section ul li:last-child {
+    border-bottom: none;
+}
+
+.btn {
+    background-color: #007bff;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -54,8 +138,69 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
+.save-btn{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#save-button{
+    margin: 0 auto;
+}
 
-.save-btn:hover {
-    background-color: #d72335; /* Slightly darker red for the hover effect */
+.btn:hover {
+    background-color: #0069d9;
     transform: scale(1.05);
+}
+
+.logout-btn {
+    background-color: #e2433b;
+    margin-top: 10px;
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+}
+
+@media (max-width: 768px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-content {
+        gap: 10px;
+    }
+}
+@media (max-width: 460px) {
+    .header {
+   
+        width: 100%;
+
+}
+}
+
+.logo{
+    width: 50px;
+    height: 50px;
+}
+.logo img{
+    width: 80px;
+    height: 90px;
+    margin-left: -20px;
+    margin-top: -20px;
+}
+.loader {
+display: none;
+border: 4px solid #f3f3f3; /* Light grey */
+border-top: 4px solid #3498db; /* Blue */
+border-radius: 50%;
+width: 30px;
+height: 30px;
+animation: spin 2s linear infinite;
+margin: 0px auto; /* Center it */
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
 }

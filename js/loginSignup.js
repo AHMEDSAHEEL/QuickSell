@@ -97,6 +97,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
             setTimeout(() => {
                 hideSpinner('login-spinner');
                 redirectToDashboard(role);
+                success.style.display = "none";
                 document.getElementById('login-form').reset();
             }, 3500);
         } else {
@@ -141,6 +142,9 @@ document.getElementById('signup-form').addEventListener('submit', async function
     const password = document.getElementById('signup-password').value;
     const mobile = document.getElementById('signup-mobile').value; // Fix ID for mobile input
     const role=document.getElementById('roleSelect').value;
+   // document.getElementById('signup-spinner').style.display='block'
+   const signup_success= document.getElementById('signup-success');
+   signup_success.style.display = "none";
     showSpinner('signup-spinner');
 
     try {
@@ -150,9 +154,12 @@ document.getElementById('signup-form').addEventListener('submit', async function
         console.log(2);
         if (!userQuery.empty) {
             alert("Email already exists");
-            throw new Error("Email already exists"); // To ensure that the code execution stops here
+            hideSpinner('signup-spinner');
+            throw new Error("Email already exists");
+           
+             // To ensure that the code execution stops here
         }
-
+     else{
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
@@ -163,20 +170,25 @@ document.getElementById('signup-form').addEventListener('submit', async function
             password: password,
             mobile: mobile,
             isAdmin: false ,
-            role: role// Set to true if needed
+            role: role 
         });
-
+    
         document.getElementById('signup-emoji-icon').textContent = "👫";
-        document.getElementById('success').textContent = "Signup Successful";
+        signup_success.style.display="block"
+        signup_success.textContent = "Signup Successful";
         setTimeout(() => {
+            hideSpinner('signup-spinner');
             window.location.href = "../index.html";
-        }, 2000);
+            document.getElementById('signup-form').reset();
+        }, 2000);}
+        
     } catch (error) {
         document.getElementById('failure').textContent = error.message;
         document.getElementById('signup-emoji-icon').textContent = '🤦‍♂🤦‍♀';
-    } finally {
-        hideSpinner('signup-spinner');
-    }
+    } 
+       
+       
+    
 });
 
 // Password visibility toggle

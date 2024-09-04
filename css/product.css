@@ -1,0 +1,254 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-image: linear-gradient(#13072e, #200b4e);
+    color: #333;
+    line-height: 1.6;
+}
+
+/* header {
+    background-image: linear-gradient(#13072e, #200b4e);
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+} */
+
+main {
+    padding: 1rem;
+    /* display: inline-block;
+    justify-content: center;
+    text-align: center; */
+
+}
+
+#search-bar {
+    width: 100%;
+    max-width: 100vp;
+    margin: 0 auto 40px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#search-bar:focus {
+    border-color: #13072e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
+
+#products {
+    min-height: 100vh;
+    padding: 50px 20px;
+    background-image: linear-gradient(#13072e, #200b4e);
+    color: white;
+    animation: slideInLeft 1s ease-out forwards;
+    overflow-x: hidden;
+
+}
+
+#products h2 {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.product-card {
+    background-color: white;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+}
+
+.product-card img {
+    width: 100%;
+    height: 300px;
+
+    border-radius: 5px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px #070017;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.product-card img:hover {
+    transform: scale(1.05);
+}
+
+.product-card h3 {
+    font-size: 22px;
+    margin: 10px 0;
+}
+
+.product-card p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.product-card button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    margin: 5px;
+}
+
+.product-card .buy {
+    background-color: #28a745;
+    color: white;
+}
+
+.product-card .buy:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+.product-card .add {
+    background-color: #007bff;
+    color: white;
+}
+
+.product-card .add:hover {
+    background-color: #0069d9;
+    transform: scale(1.05);
+}
+
+.product-card button:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+
+    #search-bar {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    #search-bar {
+        padding: 10px 15px;
+        font-size: .5rem;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    margin: 50px auto;
+    display: block;
+    max-width: 90%;
+    max-height: 80%;
+}
+
+#caption {
+    margin: 15px;
+    text-align: center;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #ddd;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.expiry-timer {
+    color: red;
+}
+
+.product-card .delete {
+    display: none;
+    background-color: red;
+    color: white;
+}
+
+.product-card .delete:hover {
+    background-color: #cb4949;
+    transform: scale(1.05);
+}
+
+/* Add this to your CSS file or within a <style> tag */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
