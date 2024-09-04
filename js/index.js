@@ -1,23 +1,22 @@
 
 
+const firebaseConfig = {
+    apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
+    authDomain: "quicksell-374b8.firebaseapp.com",
+    projectId: "quicksell-374b8",
+    storageBucket: "quicksell-374b8.appspot.com",
+    messagingSenderId: "984641749083",
+    appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
 document.addEventListener('DOMContentLoaded', function () {
 
 
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDRGzwePftO0o42hMGCQHx-K845Xjl4zEQ",
-        authDomain: "quicksell-374b8.firebaseapp.com",
-        projectId: "quicksell-374b8",
-        storageBucket: "quicksell-374b8.appspot.com",
-        messagingSenderId: "984641749083",
-        appId: "1:984641749083:web:6fa3360232f0fc8fceff7e"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
 
     const modal = document.getElementById('image-modal');
     const modalImg = document.getElementById('modal-img');
@@ -29,61 +28,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('user').style.display = 'none';
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            document.getElementById('user').style.display = 'block';
             const userDoc = await db.collection('users').doc(user.uid).get();
             const role = userDoc.data().role;
             console.log(role);
             console.log(user.uid);
+
+            // Show admin panel based on role
             document.getElementById('admin-panel').style.display = (role === 'Admin' || role === 'Vendor') ? 'block' : 'none';
-
-            //  Update visibility of delete buttons
-            if (role === 'Admin') {
-                // Admins can delete any product
-                console.log(1);
-                document.querySelectorAll('.delete').forEach(button => {
-                    button.style.display = 'inline-block';
-                });
-            }
-
-            if (role === 'Vendor') {
-                console.log(role);
-
-                try {
-                    const productsSnapshot = await db.collection('products').where('vendorId', '==', user.uid).get();
-                    console.log('Query executed');
-
-                    if (productsSnapshot.empty) {
-                        console.log('No matching products.');
-                        return;
-                    }
-
-                    productsSnapshot.forEach(doc => {
-                        console.log('Product found:', doc.id);
-                        const deleteButton = document.querySelector(`[data-product-id="${doc.id}"] .delete`);
-                        console.log(deleteButton)
-                        if (deleteButton) {
-                            deleteButton.style.display = 'inline-block';
-                        }
-                        else {
-                            console.log('not')
-                        }
-                        // document.querySelectorAll('.products').forEach(card => {
-                        //     const vendorId = card.getAttribute('data-vendor-id'); // Assuming each product card has this attribute
-                        //     console.log(vendorId)
-                        //     if (user.uid !== vendorId && role !== 'Admin') {
-                        //         card.querySelector('.delete').style.display = 'none';
-                        //     }
-                        // });
-                    });
-                } catch (error) {
-                    console.error('Error fetching products:', error);
-                }
-            }
-
-
-
-            // Hide delete buttons for other vendors' products
-
+            document.getElementById('user').style.display = 'block';
+            // Call the function to update delete button visibility
+            updateDeleteButtonsVisibility(role, user.uid);
 
         } else {
             document.getElementById('sign-in').style.display = 'block';
@@ -93,15 +47,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 button.style.display = 'none';
             });
         }
-
-        // Helper function to check if the user is an admin (not currently used but kept for future use)
-        // async function isAdmin(userId) {
-        //     const userDoc = await db.collection('users').doc(userId).get();
-        //     return userDoc.data().role === 'Admin';
-        // }
-
     });
-
+    function updateDeleteButtonsVisibility(role, userId) {
+        document.querySelectorAll('.product-card').forEach(card => {
+            const productId = card.getAttribute('data-product-id');
+            const deleteButton = card.querySelector('.delete');
+            if (role === 'Admin' || (role === 'Vendor' && card.getAttribute('data-vendor-id') === userId)) {
+                deleteButton.style.display = 'inline-block';
+            } else {
+                deleteButton.style.display = 'none';
+            }
+        });
+    }
 
 
     document.getElementById('user').addEventListener('click', () => {
@@ -207,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const storageRef = storage.ref();
         const uniqueFileName = `${Date.now()}_${file.name}`; // Use timestamp or UUID for uniqueness
-        const newImageRef = storageRef.child(`images/${uniqueFileName}`);
+        const newImageRef = storageRef.child(`ProductImage/${uniqueFileName}`);
 
         // If there is an old image URL, delete the old image
         if (oldImageUrl) {
@@ -258,23 +215,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+  // Render product card and then update the button visibility
+  function renderProductCard(product) {
+    const { id, name, price, expiryDays, imageFileUrl, timestamp, vendorId } = product;
+    const newProductCard = document.createElement('div');
+    newProductCard.classList.add('product-card');
+    newProductCard.setAttribute('data-product-id', id);
+    newProductCard.setAttribute('data-vendor-id', vendorId); // Assuming vendorId is stored in the product data
 
-    function renderProductCard(product) {
-        const { id, name, price, expiryDays, imageFileUrl, timestamp } = product;
-        const newProductCard = document.createElement('div');
-        newProductCard.classList.add('product-card');
-        newProductCard.setAttribute('data-product-id', id);
-
-        newProductCard.innerHTML = `
-            <img src="${imageFileUrl}" alt="${name}">
-            <h3>${name}</h3>
-            <p>Price: ₹${price.toFixed(2)}</p>
-            <p class="expiry-timer">Expires in ${expiryDays} days</p>
-            <button class="buy" id="buy">buy</button>
-            <button class="add" id="add">Add</button>  
-           <button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button> 
-        `;
-        document.getElementById('product-grid').appendChild(newProductCard);
+    newProductCard.innerHTML = `
+        <img src="${imageFileUrl}" alt="${name}">
+        <h3>${name}</h3>
+        <p>Price: ₹${price.toFixed(2)}</p>
+        <p class="expiry-timer">Expires in ${expiryDays} days</p>
+        <button class="buy" id="buy">buy</button>
+        <button class="add" id="add">Add</button>  
+        <button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>
+    `;
+    document.getElementById('product-grid').appendChild(newProductCard);
         newProductCard.querySelector('img').addEventListener('click', () => {
             modal.style.display = "block";
             modalImg.src = imageFileUrl;
@@ -324,7 +282,18 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update the timer immediately and then every second
         updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection('users').doc(user.uid).get().then(userDoc => {
+                    const role = userDoc.data().role;
+                    updateDeleteButtonsVisibility(role, user.uid);
+                   
+                });
+            }
+        });
     }
+
+    
     function logAction(userId, actionType, resourceId, email) {
         db.collection('auditLogs').add({
             userId,
@@ -411,14 +380,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 existingViewMoreButton.remove(); // Remove button if no longer needed
             }
         }
-
         // Initial call to update the "View More" button
         updateViewMoreButton();
-
-        // Listen for changes (e.g., product deletion) and update button accordingly
-        // You should call `updateViewMoreButton()` after any operation that changes the number of products
-
-
         loader.style.display = 'none';
         productGrid.style.display = 'flex';
         const products = document.querySelector('#products');
@@ -431,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     productCards.forEach((card, index) => {
                         setTimeout(() => {
                             card.classList.add('animate');
-                        }, index * 100); // Stagger animation by 100ms
+                        }, index *50); // Stagger animation by 100ms
                     });
                 }
             });
@@ -439,14 +402,43 @@ document.addEventListener('DOMContentLoaded', function () {
         productsObserver.observe(products);
 
     });
+    function generateRandomId(length = 12) {
+        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let id = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charset.length);
+            id += charset[randomIndex];
+        }
+        return id;
+    }
+    
+    // Function to check if the ID already exists in Firestore
+    async function isIdUnique(id) {
+        const productRef = db.collection('products').doc(id);
+        const doc = await productRef.get();
+        return !doc.exists; // Return true if the ID does not exist
+    }
+    
+    // Function to generate a unique ID and save a new product
+    async function getUniqueProductId() {
+        let unique = false;
+        let id = '';
+    
+        while (!unique) {
+            id = generateRandomId();
+            unique = await isIdUnique(id);
+        }
+    
+        return id;
+    }
+    
 
     const productForm = document.getElementById('product-form');
-
     productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-
         document.getElementById('spinner').style.display = 'block';
-        const productId = document.getElementById('product-id').value.trim();
+      //  const productId = document.getElementById('product-id').value.trim();
+      const productId= await getUniqueProductId();
         const name = document.getElementById('product-name').value.trim();
         const price = parseFloat(document.getElementById('product-price').value);
         const expiryDays = parseInt(document.getElementById('expiry-days').value, 10);
@@ -460,20 +452,33 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-
-
         try {
             await saveProductToFirestore(productId, name, price, expiryDays, imageFile);
             document.getElementById('spinner').style.display = 'none';
             alert('Product updated/added successfully');
             productForm.reset();
             document.getElementById('file-name').textContent = 'No file chosen';
+
+            // Render the product card for the newly added product
+            // const newProduct = {
+            //     id: productId,
+            //     name,
+            //     price,
+            //     expiryDays,
+            //     imageFileUrl: await uploadImage(imageFile),
+            //     timestamp: Date.now(),
+            //     vendorId: auth.currentUser.uid
+            // };
+           // renderProductCard(newProduct);
+            
+
         } catch (error) {
             document.getElementById('spinner').style.display = 'none';
             console.error('Error updating product:', error);
         }
     });
-    // Close modal when user clicks on close button
+
+
     close.addEventListener('click', () => {
         modal.style.display = "none";
     });
@@ -484,140 +489,163 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.style.display = "none";
         }
     });
+    // Form submit handler
+    document.getElementById('vendor-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        document.getElementById('vendor-spinner').style.display = 'block';
 
-// Authentication state listener
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        const userRole = await getUserRole(user.uid);
-        const vendorRef = db.collection('vendors').doc(user.email);
-        const vendorDoc = await vendorRef.get();
-        const h2 = document.getElementById('h2-vendorList');
-        h2.style.display = 'none';
-
-        if (vendorDoc.exists) {
-            // Vendor exists, hide form and display vendor list
-            h2.style.display = 'block';
-            document.getElementById('vendor-form-container').style.display = 'none';
-            document.getElementById('vendors').style.display = 'block';
-            displayAllVendors(userRole, user.email);
-        } else if (userRole === 'Vendor' && !vendorDoc.exists) {
-            // Vendor info doesn't exist, show form to add vendor
-            document.getElementById('vendor-form-container').style.display = 'block';
-            document.getElementById('vendors').style.display = 'block';
-            h2.style.display = 'none';
-
-            document.getElementById('vendor-form').addEventListener('submit', async function (e) {
-                e.preventDefault();
-                document.getElementById('vendor-spinner').style.display = 'block';
-
-                const name = document.getElementById('vendor-name').value.trim();
-                const address = document.getElementById('shop-address').value.trim();
-                const mobile = document.getElementById('mobile-number').value.trim();
-                const imageFile = document.getElementById('vendor-image').files[0];
-
-                if (!name || !address || !mobile || !imageFile) {
-                    alert('Please fill out all fields and upload an image.');
-                    return;
-                }
-
-                try {
-                    const userEmail = auth.currentUser.email;
-                    let imageUrl = '';
-
-                    if (imageFile) {
-                        imageUrl = await uploadVendorImage(imageFile, userEmail);
-                    } else {
-                        alert('No image uploaded');
-                    }
-
-                    const vendorData = {
-                        name,
-                        address,
-                        mobile,
-                        imageUrl: imageUrl || '',
-                        email: userEmail,
-                        userId: auth.currentUser.uid,
-                        timestamp: Date.now()
-                    };
-
-                    await db.collection('vendors').doc(userEmail).set(vendorData);
-                    displayAllVendors(await getUserRole(auth.currentUser.uid), userEmail);
-                    document.getElementById('vendor-form-container').style.display = 'none';
-                    alert('Successfully added vendor');
-                } catch (error) {
-                    console.error('Error saving vendor information:', error);
-                } finally {
-                    document.getElementById('vendor-spinner').style.display = 'none';
-                }
-            });
-        } else {
-            // User is an Admin or another role; show vendor list only
-            document.getElementById('vendor-form-container').style.display = 'none';
-            document.getElementById('vendors').style.display = 'block';
-            h2.style.display = 'none';
-            displayAllVendors(userRole, user.email);
+        const name = document.getElementById('vendor-name').value.trim();
+        const address = document.getElementById('shop-address').value.trim();
+        const mobile = document.getElementById('mobile-number').value.trim();
+        const imageFile = document.getElementById('vendor-image').files[0];
+        const fileNameDisplay = document.getElementById('vendor-file-name');
+        if (!name || !address || !mobile || !imageFile) {
+            alert('Please fill out all fields and upload an image.');
+            return;
         }
-    } else {
-        // Redirect to login if not signed in
-        window.location.href = 'html/loginSignUp.html';
-    }
+
+        try {
+            const userEmail = auth.currentUser.email;
+            let imageUrl = '';
+
+            if (imageFile) {
+                imageUrl = await uploadVendorImage(imageFile, userEmail);
+            } else {
+                alert('No image uploaded');
+            }
+
+            const vendorData = {
+                name,
+                address,
+                mobile,
+                imageUrl: imageUrl || '',
+                email: userEmail,
+                userId: auth.currentUser.uid,
+                timestamp: Date.now()
+            };
+
+            await db.collection('vendors').doc(userEmail).set(vendorData);
+            await refreshVendorListAndForm();
+            document.getElementById('vendor-form-container').style.display = 'none';
+            alert('Successfully added vendor');
+        } catch (error) {
+            console.error('Error saving vendor information:', error);
+        } finally {
+            document.getElementById('vendor-spinner').style.display = 'none';
+        }
+    });
+
+    // Authentication state listener
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const userRole = await getUserRole(user.uid);
+            const vendorRef = db.collection('vendors').doc(user.email);
+            const vendorDoc = await vendorRef.get();
+            const h2 = document.getElementById('h2-vendorList');
+console.log(77)
+            if (vendorDoc.exists) {
+                // Vendor exists, hide form and display vendor list
+                h2.style.display = 'block';
+                document.getElementById('vendor-form-container').style.display = 'none';
+                document.getElementById('vendors').style.display = 'block';
+            } else {
+                // User is an Admin or another role; show vendor list only
+                document.getElementById('vendor-form-container').style.display = 'none';
+                document.getElementById('vendors').style.display = 'block';
+                h2.style.display = 'block';
+            }
+
+            // Always display all vendors
+            await refreshVendorListAndForm();
+        } else {
+            // Redirect to login if not signed in
+            window.location.href = 'html/loginSignUp.html';
+        }
+    });
 });
 
+
 // Function to display all vendors based on role
-function displayAllVendors(userRole, userEmail) {
-    db.collection('vendors').get().then((vendorsSnapshot) => {
-        const vendorGrid = document.getElementById('vendor-grid');
-        vendorGrid.innerHTML = ''; // Clear previous vendors
+// Function to display all vendors based on role
+// async function displayAllVendors(userRole, userEmail) {
+//     try {
+//         const vendorsSnapshot = await db.collection('vendors').get();
+//         const vendorGrid = document.getElementById('vendor-grid');
+//         vendorGrid.innerHTML = ''; // Clear previous vendors
 
-        let index = 0; // To keep track of the delay for each card
-        vendorsSnapshot.forEach((doc) => {
-            const vendorData = doc.data();
-            const vendorCard = document.createElement('div');
-            vendorCard.className = 'vendor-card';
-            vendorCard.setAttribute('data-user-id', vendorData.email);
+//         let index = 0; // To keep track of the delay for each card
+//         vendorsSnapshot.forEach((doc) => {
+//             const vendorData = doc.data();
+//             const vendorCard = document.createElement('div');
+//             vendorCard.className = 'vendor-card';
+//             vendorCard.setAttribute('data-user-id', vendorData.email);
 
-            vendorCard.innerHTML = `
-                <img src="${vendorData.imageUrl}" alt="Vendor Image">
-                <h3>${vendorData.name}</h3>
-                <p>Address: ${vendorData.address}</p>
-                <p>Mobile: ${vendorData.mobile}</p>
-                <div class='edit-delete-container'>
-                    ${userRole === 'Admin' || (userRole === 'Vendor' && vendorData.email === userEmail) ? `<button class="delete-button">Delete</button>` : ''}
-                    ${userRole === 'Vendor' && vendorData.email === userEmail ? `<button class="edit-button">Edit</button>` : ''}
-                </div>
-            `;
+//             vendorCard.innerHTML = `
+//                 <img src="${vendorData.imageUrl}" alt="Vendor Image">
+//                 <h3>${vendorData.name}</h3>
+//                 <p>Address: ${vendorData.address}</p>
+//                 <p>Mobile: ${vendorData.mobile}</p>
+//                 <div class='edit-delete-container'>
+//                     ${userRole === 'Admin' || (userRole === 'Vendor' && vendorData.email === userEmail) ? `<button class="delete-button">Delete</button>` : ''}
+//                     ${userRole === 'Vendor' && vendorData.email === userEmail ? `<a href="#vendor-form-container" class="edit-button">Edit</a>` : ''}
+//                 </div>
+//             `;
 
-            vendorGrid.appendChild(vendorCard);
+//             vendorGrid.appendChild(vendorCard);
 
-            // Handle edit button functionality
-            const editButton = vendorCard.querySelector('.edit-button');
-            if (editButton) {
-                editButton.addEventListener('click', () => handleEditVendor(vendorData));
-            }
+//             // Handle edit button functionality
+//             const editButton = vendorCard.querySelector('.edit-button');
+//             if (editButton) {
+//                 editButton.addEventListener('click', () => handleEditVendor(vendorData));
+//             }
 
-            // Handle delete button functionality
-            const delButton = vendorCard.querySelector('.delete-button');
-            if (delButton) {
-                delButton.addEventListener('click', async () => {
-                    if (confirm('Are you sure you want to delete this vendor?')) {
-                        await handleDeleteVendor(vendorData);
-                    }
-                });
-            }
+//             // Handle delete button functionality
+//             const delButton = vendorCard.querySelector('.delete-button');
+//             if (delButton) {
+//                 delButton.addEventListener('click', async () => {
+//                     if (confirm('Are you sure you want to delete this vendor?')) {
+//                         await handleDeleteVendor(vendorData);
+//                     }
+//                 });
+//             }
 
-            vendorCard.style.animationDelay = `${index * 0.8}s`;
-            index++;
-        });
-
-        document.getElementById('vendors').classList.remove('hidden');
-    });
-}
-
+//             vendorCard.style.animationDelay = `${index * 0.8}s`;
+//             index++;
+//         });
+       
+//         document.getElementById('vendors').classList.remove('hidden');
+//     } catch (error) {
+//         console.error('Error displaying vendors:', error);
+//     }
+    
+// }
+document.getElementById('vendor-edit-cancel').style.display='none';
 // Handle vendor edit functionality
 async function handleEditVendor(vendorData) {
+
     db.collection('vendors').doc(vendorData.email).get().then((vendorDoc) => {
-        const vendorData = vendorDoc.data();
         document.getElementById('edit-AddvendorH1').textContent = "Edit Vendor";
+        const cancel= document.getElementById('vendor-edit-cancel');
+        cancel.addEventListener('click',()=>{
+            document.getElementById('edit-AddvendorH1').textContent = "Add Vendor";
+            cancel.style.display='none'
+           // Hide the vendor form container
+    const formContainer = document.getElementById('vendor-form-container');
+    if (formContainer) {
+        formContainer.style.display = 'none';
+       
+    }
+
+    // Show the vendor list or edit button
+    const vendorListContainer = document.getElementById('vendor-list-container');
+    if (vendorListContainer) {
+        vendorListContainer.style.display = 'block'; // Ensure the vendor list is visible
+    }
+        })
+        document.getElementById('vendor-edit-cancel').style.display='block';
+        const vendorData = vendorDoc.data();
+        document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
+
         document.getElementById('vendor-name').value = vendorData.name;
         document.getElementById('shop-address').value = vendorData.address;
         document.getElementById('mobile-number').value = vendorData.mobile;
@@ -684,11 +712,13 @@ async function handleDeleteVendor(vendorData) {
             vendorCard.remove();
             // After removal, refresh the vendor list and show the form if needed
             refreshVendorListAndForm();
+            
         }, 600);
     } catch (error) {
         console.error('Error deleting vendor:', error);
     }
 }
+
 
 // Function to delete vendor from Firestore and Storage
 async function deleteVendorFromFirestore(email) {
@@ -724,28 +754,106 @@ async function deleteVendorFromFirestore(email) {
 }
 
 // Function to refresh vendor list and show the form if needed
+// Function to refresh vendor list and show the form if needed
 async function refreshVendorListAndForm() {
     const user = auth.currentUser;
 
     if (user) {
         const userRole = await getUserRole(user.uid);
-        const vendorRef = db.collection('vendors').doc(user.email);
-        const vendorDoc = await vendorRef.get();
-
-        if (userRole === 'Vendor' && !vendorDoc.exists) {
-            // Vendor info doesn't exist, show form to add vendor
-            document.getElementById('vendor-form-container').style.display = 'block';
-            document.getElementById('vendors').style.display = 'block';
-        } else {
-            // Vendor info exists or user is an Admin; show vendor list only
+    
+        // Fetch all vendors from Firestore
+        const vendorsSnapshot = await db.collection('vendors').get();
+        const userDoc = await db.collection('vendors').doc(user.email).get(); // Get the document and check its existence
+        
+        const h2 = document.getElementById('h2-vendorList');
+        
+        if (userRole === 'Vendor') {
+            if (userDoc.exists) {
+                // Vendor data exists, show the vendor list and hide the form
+                document.getElementById('vendor-form-container').style.display = 'none';
+                document.getElementById('vendors').style.display = 'block';
+                h2.style.display = 'block';
+            } else {
+                // Vendor data does not exist, show the form to add vendor
+                document.getElementById('vendor-form-container').style.display = 'block';
+                document.getElementById('vendors').style.display = 'block';
+                h2.style.display = 'block';
+            }
+        } else if (userRole === 'Admin' || userRole=== 'User') {
+            // Admins should always see the vendor list and not the form
             document.getElementById('vendor-form-container').style.display = 'none';
             document.getElementById('vendors').style.display = 'block';
+            h2.style.display = 'block';
+        } else {
+            // For other roles (e.g., User), show the vendor list
+            document.getElementById('vendor-form-container').style.display = 'none';
+            document.getElementById('vendors').style.display = 'none';
+            h2.style.display = 'none';
         }
+    
+        // Display all vendors
+        await displayAllVendors(userRole, user.email);
+    } else {
+        console.error('User not authenticated');
+    }
+    
+}
 
-        // Reload the vendor list
-        displayAllVendors(userRole, user.email);
+async function displayAllVendors(userRole, userEmail) {
+    try {
+        const vendorsSnapshot = await db.collection('vendors').get();
+        const vendorGrid = document.getElementById('vendor-grid');
+        vendorGrid.innerHTML = ''; // Clear previous vendors
+
+        let index = 0;
+        vendorsSnapshot.forEach((doc) => {
+            const vendorData = doc.data();
+            const vendorCard = document.createElement('div');
+            vendorCard.className = 'vendor-card';
+            vendorCard.setAttribute('data-user-id', vendorData.email);
+
+            vendorCard.innerHTML = `
+                <img src="${vendorData.imageUrl}" alt="Vendor Image">
+                <h3>${vendorData.name}</h3>
+                <p>Address: ${vendorData.address}</p>
+                <p>Mobile: ${vendorData.mobile}</p>
+                <div class='edit-delete-container'>
+                    ${userRole === 'Admin' || (userRole === 'Vendor' && vendorData.email === userEmail) ? `<button class="delete-button">Delete</button>` : ''}
+                    ${userRole === 'Vendor' && vendorData.email === userEmail ? `<a href="#vendor-form-container" class="edit-button">Edit</a>` : ''}
+                </div>
+            `;
+
+            vendorGrid.appendChild(vendorCard);
+
+            const editButton = vendorCard.querySelector('.edit-button');
+            if (editButton) {
+                editButton.addEventListener('click', () => 
+                {
+                    console.log('he')
+                    document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
+                    handleEditVendor(vendorData);
+                }
+                )}
+
+            const delButton = vendorCard.querySelector('.delete-button');
+            if (delButton) {
+                delButton.addEventListener('click', async () => {
+                    if (confirm('Are you sure you want to delete this vendor?')) {
+                        await handleDeleteVendor(vendorData);
+                    }
+                });
+            }
+
+            vendorCard.style.animationDelay = `${index * 0.8}s`;
+            index++;
+        });
+
+        document.getElementById('vendors').classList.remove('hidden');
+    } catch (error) {
+        console.error('Error displaying vendors:', error);
     }
 }
+
 
 // Function to upload vendor image
 async function uploadVendorImage(file, userEmail) {
@@ -807,4 +915,4 @@ vendorImageInput.addEventListener('change', function () {
     const fileNameDisplay = document.getElementById('vendor-file-name');
     fileNameDisplay.textContent = fileName ? `Selected file: ${fileName}` : 'No file chosen';
 });
-});
+

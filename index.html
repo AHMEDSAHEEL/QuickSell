@@ -86,6 +86,8 @@
             <!-- Vendor cards will be dynamically inserted here -->
         </div>
     </div>
+
+
     <div id="vendor-form-container">
         <h2 id="edit-AddvendorH1">Add Vendor</h2>
         <form id="vendor-form">
@@ -98,6 +100,7 @@
             <div id="vendor-spinner" class="spinner hidden"></div>
           
             <button type="submit">Add Vendor</button>
+            <button  id="vendor-edit-cancel">Cancel</button>
         </form>
         <p id="vendor-message"></p>
     </div>
@@ -107,7 +110,7 @@
         <h2>Admin Panel</h2>
 
         <form id="product-form">
-            <input type="number" id="product-id" placeholder="Product ID" required>
+          
             <input type="text" id="product-name" placeholder="Product Name" required>
             <input type="number" id="product-price" placeholder="Discounted Price" step="0.01" required>
             <input type="number" id="expiry-days" placeholder="Expires/Offer in (days)" required>
