@@ -238,6 +238,7 @@ li:hover{
 }
 
 .product-card h3 {
+    text-transform: uppercase;
     font-size: 22px;
     margin: 0;
 }
@@ -255,7 +256,9 @@ li:hover{
     transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
     margin: 5px;
 }
-
+.expiry-timer{
+    color: red;
+}
 .product-card .buy {
     background-color: #28a745;
     color: white;
@@ -490,7 +493,7 @@ li:hover{
     align-items: center;
     margin-top: 10PX;
 } 
-.edit-delete-container .edit-button,.edit-delete-container .delete-button{
+.edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
     
     top: 10px;
     right: 70px; 
@@ -505,10 +508,13 @@ li:hover{
   
 
 .vendor-card .edit-button:hover {
-    background: #e64a19;
+    background:  #28a745;
 }
 .vendor-card .delete-button {
     background: red;
+}
+.vendor-card .view-button {
+    background: #007bff;
 }
 
 .vendor-card .delete-button:hover {
@@ -735,6 +741,15 @@ footer {
      }
 }
 
+
+@media (max-width: 420px) {
+.edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
+    
+
+    padding:  8px 12px;
+ 
+}
+}
 .spinner {
     display: none;
     margin: 0 auto;
@@ -751,9 +766,7 @@ footer {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.expiry-timer{
-    color: red;
-}.loader {
+.loader {
     border: 4px solid #f3f3f3; /* Light grey */
     border-top: 4px solid #3498db; /* Blue */
     border-radius: 50%;

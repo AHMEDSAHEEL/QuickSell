@@ -4,15 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Products</title>
-    
-    <!-- External CSS for styling -->
-    <link rel="stylesheet" href="../css/product.css">
-    
-    <!-- Google Fonts for professional typography -->
-
-    
-    <!-- Firebase JS SDKs -->
+    <title>Vendor Products</title>
+    <link rel="stylesheet" href="../css/vendorProduct.css">
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
@@ -21,20 +14,42 @@
 
 <body>
 
+    <!-- <header>
+        <div class="logo"><img src="images/quicSell_Q_logo.png" alt="logo"></div>
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="sign-in" id="sign-in"><a href="html/loginSignUp.html">Sign-in</a></div>
+        <div class="userProfile" id="user">
+            <img src="images/user.png" alt="👤" id="userProfile">
+        </div>
+    </header> -->
+
     <header>
-        <h1>Explore Our Products</h1>
+        <h1 id="vendor-name"></h1>
     </header>
 
     <section id="search-container">
         <input type="text" id="search-bar" placeholder="Search by product name">
-      
+       
     </section>
 
 
 
     <main id="products">
-       
+        
+        
         <div class="product-grid" id="product-grid"></div>
+        <p id="no-products-message" class="hidden"></p>
     </main>
 
     <!-- Full-Size Image Modal -->
@@ -44,7 +59,11 @@
         <div id="caption"></div>
     </div>
 
-    <script src="../js/product.js"></script>
+   
+
+  
+
+    <script src="../js/vendorproduct.js"></script>
 </body>
 
 </html>

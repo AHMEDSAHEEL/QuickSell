@@ -459,19 +459,6 @@ document.addEventListener('DOMContentLoaded', function () {
             productForm.reset();
             document.getElementById('file-name').textContent = 'No file chosen';
 
-            // Render the product card for the newly added product
-            // const newProduct = {
-            //     id: productId,
-            //     name,
-            //     price,
-            //     expiryDays,
-            //     imageFileUrl: await uploadImage(imageFile),
-            //     timestamp: Date.now(),
-            //     vendorId: auth.currentUser.uid
-            // };
-           // renderProductCard(newProduct);
-            
-
         } catch (error) {
             document.getElementById('spinner').style.display = 'none';
             console.error('Error updating product:', error);
@@ -564,61 +551,6 @@ console.log(77)
     });
 });
 
-
-// Function to display all vendors based on role
-// Function to display all vendors based on role
-// async function displayAllVendors(userRole, userEmail) {
-//     try {
-//         const vendorsSnapshot = await db.collection('vendors').get();
-//         const vendorGrid = document.getElementById('vendor-grid');
-//         vendorGrid.innerHTML = ''; // Clear previous vendors
-
-//         let index = 0; // To keep track of the delay for each card
-//         vendorsSnapshot.forEach((doc) => {
-//             const vendorData = doc.data();
-//             const vendorCard = document.createElement('div');
-//             vendorCard.className = 'vendor-card';
-//             vendorCard.setAttribute('data-user-id', vendorData.email);
-
-//             vendorCard.innerHTML = `
-//                 <img src="${vendorData.imageUrl}" alt="Vendor Image">
-//                 <h3>${vendorData.name}</h3>
-//                 <p>Address: ${vendorData.address}</p>
-//                 <p>Mobile: ${vendorData.mobile}</p>
-//                 <div class='edit-delete-container'>
-//                     ${userRole === 'Admin' || (userRole === 'Vendor' && vendorData.email === userEmail) ? `<button class="delete-button">Delete</button>` : ''}
-//                     ${userRole === 'Vendor' && vendorData.email === userEmail ? `<a href="#vendor-form-container" class="edit-button">Edit</a>` : ''}
-//                 </div>
-//             `;
-
-//             vendorGrid.appendChild(vendorCard);
-
-//             // Handle edit button functionality
-//             const editButton = vendorCard.querySelector('.edit-button');
-//             if (editButton) {
-//                 editButton.addEventListener('click', () => handleEditVendor(vendorData));
-//             }
-
-//             // Handle delete button functionality
-//             const delButton = vendorCard.querySelector('.delete-button');
-//             if (delButton) {
-//                 delButton.addEventListener('click', async () => {
-//                     if (confirm('Are you sure you want to delete this vendor?')) {
-//                         await handleDeleteVendor(vendorData);
-//                     }
-//                 });
-//             }
-
-//             vendorCard.style.animationDelay = `${index * 0.8}s`;
-//             index++;
-//         });
-       
-//         document.getElementById('vendors').classList.remove('hidden');
-//     } catch (error) {
-//         console.error('Error displaying vendors:', error);
-//     }
-    
-// }
 document.getElementById('vendor-edit-cancel').style.display='none';
 // Handle vendor edit functionality
 async function handleEditVendor(vendorData) {
@@ -798,7 +730,6 @@ async function refreshVendorListAndForm() {
     }
     
 }
-
 async function displayAllVendors(userRole, userEmail) {
     try {
         const vendorsSnapshot = await db.collection('vendors').get();
@@ -806,52 +737,86 @@ async function displayAllVendors(userRole, userEmail) {
         vendorGrid.innerHTML = ''; // Clear previous vendors
 
         let index = 0;
+        let vendors = [];
+        
         vendorsSnapshot.forEach((doc) => {
-            const vendorData = doc.data();
-            const vendorCard = document.createElement('div');
-            vendorCard.className = 'vendor-card';
-            vendorCard.setAttribute('data-user-id', vendorData.email);
-
-            vendorCard.innerHTML = `
-                <img src="${vendorData.imageUrl}" alt="Vendor Image">
-                <h3>${vendorData.name}</h3>
-                <p>Address: ${vendorData.address}</p>
-                <p>Mobile: ${vendorData.mobile}</p>
-                <div class='edit-delete-container'>
-                    ${userRole === 'Admin' || (userRole === 'Vendor' && vendorData.email === userEmail) ? `<button class="delete-button">Delete</button>` : ''}
-                    ${userRole === 'Vendor' && vendorData.email === userEmail ? `<a href="#vendor-form-container" class="edit-button">Edit</a>` : ''}
-                </div>
-            `;
-
-            vendorGrid.appendChild(vendorCard);
-
-            const editButton = vendorCard.querySelector('.edit-button');
-            if (editButton) {
-                editButton.addEventListener('click', () => 
-                {
-                    console.log('he')
-                    document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
-                    handleEditVendor(vendorData);
-                }
-                )}
-
-            const delButton = vendorCard.querySelector('.delete-button');
-            if (delButton) {
-                delButton.addEventListener('click', async () => {
-                    if (confirm('Are you sure you want to delete this vendor?')) {
-                        await handleDeleteVendor(vendorData);
-                    }
-                });
-            }
-
-            vendorCard.style.animationDelay = `${index * 0.8}s`;
-            index++;
+            vendors.push(doc.data());
         });
 
+        // Display initial chunk of vendors
+        displayVendorsChunk(vendors.slice(0, 4), userRole, userEmail);
+
+        // Show "View More" button if there are more vendors
+        if (vendors.length > 4) {
+            const viewMoreButton = document.createElement('button');
+            viewMoreButton.textContent = 'View More';
+            viewMoreButton.className = 'view-more';
+            document.getElementById('vendor-grid').parentNode.appendChild(viewMoreButton);
+
+            const currentUserEmail = auth.currentUser ? auth.currentUser.email : '';
+
+            viewMoreButton.addEventListener('click', () => {
+                window.location.href='html/allVendorList.html';
+                const targetUrl = `html/vendorProduct.html?vendorId=${encodeURIComponent(vendorData.userId)}&userEmail=${encodeURIComponent(currentUserEmail)}`;
+                window.location.href = targetUrl;
+            });
+           
+        
+            
+        }
+      
         document.getElementById('vendors').classList.remove('hidden');
     } catch (error) {
         console.error('Error displaying vendors:', error);
     }
+}
+
+function displayVendorsChunk(vendors, userRole, userEmail) {
+    const vendorGrid = document.getElementById('vendor-grid');
+    vendors.forEach((vendorData, index) => {
+        const vendorCard = document.createElement('div');
+        vendorCard.className = 'vendor-card';
+        vendorCard.setAttribute('data-user-id', vendorData.email);
+
+        vendorCard.innerHTML = `
+            <img src="${vendorData.imageUrl}" alt="Vendor Image">
+            <h3>${vendorData.name}</h3>
+            <p>Address: ${vendorData.address}</p>
+            <p>Mobile: ${vendorData.mobile}</p>
+            <div class='edit-delete-container'>
+                ${userRole === 'Admin' || (userRole === 'Vendor' && vendorData.email === userEmail) ? `<button class="delete-button">Delete</button>` : ''}
+                ${userRole === 'Vendor' && vendorData.email === userEmail ? `<a href="#vendor-form-container" class="edit-button">Edit</a>` : ''}
+               <button class="view-button" id="view-button">View Product</button>
+                </div>
+        `;
+        
+        vendorGrid.appendChild(vendorCard);
+        
+        const currentUserEmail = auth.currentUser ? auth.currentUser.email : '';
+        vendorCard.addEventListener('click', () => {
+            //  window.location.href='html/allVendorList.html';
+              const targetUrl = `html/vendorProduct.html?vendorId=${encodeURIComponent(vendorData.userId)}&userEmail=${encodeURIComponent(currentUserEmail)}`;
+              window.location.href = targetUrl;
+          });
+        const editButton = vendorCard.querySelector('.edit-button');
+        if (editButton) {
+            editButton.addEventListener('click', () => {
+                document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
+                handleEditVendor(vendorData);
+            });
+        }
+
+        const delButton = vendorCard.querySelector('.delete-button');
+        if (delButton) {
+            delButton.addEventListener('click', async () => {
+                if (confirm('Are you sure you want to delete this vendor?')) {
+                    await handleDeleteVendor(vendorData);
+                }
+            });
+        }
+      
+        vendorCard.style.animationDelay = `${index * 0.5}s`;
+    });
 }
 
 

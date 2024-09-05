@@ -11,59 +11,66 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
-document.addEventListener('DOMContentLoaded', function () {
-    const searchBar = document.getElementById('search-bar');
+document.addEventListener('DOMContentLoaded', async function () {
+    const params = new URLSearchParams(window.location.search);
+    const vendorId = params.get('vendorId');
+    const userEmail = params.get('userEmail');
+    console.log("vendor's Id: "+vendorId+"Current User-Email: "+ userEmail)
+    const vendorNameElement = document.getElementById('vendor-name');
     const productGrid = document.getElementById('product-grid');
-    const modal = document.getElementById('image-modal');
-    const modalImg = document.getElementById('modal-img');
-    const caption = document.getElementById('caption');
-    const close = document.querySelector('.close');
+    const noProductsMessage = document.getElementById('no-products-message');
+    let userRole = 'User';
 
-    let currentRole = '';
-    let currentUserId = '';
+    if (vendorId) {
+        try {
+            // Fetch vendor data using vendorId
+            const vendorQuerySnapshot = await db.collection('vendors').where('userId', '==', vendorId).get();
+            if (!vendorQuerySnapshot.empty) {
+                const vendorDoc = vendorQuerySnapshot.docs[0];
+                const vendorData = vendorDoc.data();
+                vendorNameElement.textContent = `Products by ${vendorData.name}`;
 
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            currentRole = userDoc.data().role;
-            currentUserId = user.uid;
 
-            console.log(currentRole);
-            console.log(currentUserId);
+                const userDoc = await db.collection('users').where('email', '==', userEmail).get();
+             
+                if (!userDoc.empty) {
+                    const roleDoc = userDoc.docs[0].data();
+                    userRole = roleDoc.role;
+                    console.log('User Role:', userRole);
+                }
+                else {
+                    console.error('User not found in the database');
+                }
+            } else {
+                console.error('Vendor not found');
+                vendorNameElement.textContent = 'Vendor not found';
+            }
+            // Fetch products for this vendor
+            const productsSnapshot = await db.collection('products').where('vendorId', '==', vendorId).get();
+            if (productsSnapshot.empty) {
+                noProductsMessage.textContent = "No Product to show"
+                noProductsMessage.classList.remove('hidden');
+            } else {
+                noProductsMessage.classList.add('hidden');
+                productsSnapshot.forEach(doc => {
+                    const product = { id: doc.id, ...doc.data() };
+                    renderProductCard(product);
+                });
+            }
 
-            // Hide all delete buttons initially
-            document.querySelectorAll('.delete').forEach(button => {
-                button.style.display = 'none';
-            });
-
-            // Render products based on user role
-            renderAllProducts();
-        } else {
-            document.getElementById('sign-in').style.display = 'block';
-            document.querySelectorAll('.delete').forEach(button => {
-                button.style.display = 'none';
-            });
+        } catch (error) {
+            console.error('Error fetching vendor or products:', error);
         }
-    });
-
-    async function renderAllProducts() {
-        productGrid.innerHTML = ''; // Clear existing products
-
-        const snapshot = await db.collection('products').get();
-        snapshot.forEach(doc => {
-            const product = { id: doc.id, ...doc.data() };
-            renderProductCard(product);
-        });
+    } else {
+        console.error('No vendor ID provided');
+        vendorNameElement.textContent = 'Invalid Vendor ID';
     }
 
     function renderProductCard(product) {
-        const { id, name, price, expiryDays, imageFileUrl, timestamp, vendorId } = product;
+        const { id, name, price, expiryDays, imageFileUrl, timestamp, user_id, email } = product;
         const newProductCard = document.createElement('div');
         newProductCard.classList.add('product-card');
         newProductCard.setAttribute('data-product-id', id);
-
-        // Default delete button visibility
-        const showDeleteButton = (currentRole === 'Admin') || (currentRole === 'Vendor' && vendorId === currentUserId);
 
         newProductCard.innerHTML = `
             <img src="${imageFileUrl}" alt="${name}">
@@ -72,9 +79,8 @@ document.addEventListener('DOMContentLoaded', function () {
             <p class="expiry-timer">Expires in ${expiryDays} days</p>
             <button class="buy" id="buy">Buy</button>
             <button class="add" id="add">Add</button>
-            ${showDeleteButton ? `<button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>` : ''}
+          ${(userRole === 'Admin' || (userRole === 'Vendor' && userEmail === email)) ? `<button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>` : ''}
         `;
-
         document.getElementById('product-grid').appendChild(newProductCard);
 
         // Image click event for the modal
@@ -94,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (confirmDelete) {
                     newProductCard.classList.add('fade-out');
 
-                    // Wait for the animation to complete before removing the card
+
                     setTimeout(() => {
                         deleteProductFromFirestore(productId, imageUrl);
                         newProductCard.remove();
@@ -104,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const expiryTimer = newProductCard.querySelector('.expiry-timer');
+
         let timerInterval;
 
         function updateTimer() {
@@ -174,28 +181,4 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error deleting product:', error);
         }
     }
-
-    function filterProducts() {
-        const query = searchBar.value.toLowerCase();
-        const productCards = document.querySelectorAll('.product-card');
-
-        productCards.forEach(card => {
-            const name = card.querySelector('h3').textContent.toLowerCase();
-            card.style.display = name.includes(query) ? '' : 'none';
-        });
-    }
-
-    searchBar.addEventListener('input', filterProducts);
-
-    // Close modal when user clicks on close button
-    close.addEventListener('click', () => {
-        modal.style.display = "none";
-    });
-
-    // Close modal when user clicks outside of the image
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    });
 });
