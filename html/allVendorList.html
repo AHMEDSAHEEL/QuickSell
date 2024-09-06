@@ -1,11 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>All Vendors List</title>
+    
+    <!-- External CSS for styling -->
+    <link rel="stylesheet" href="../css/allVendorList.css">
+    
+    <!-- Google Fonts for professional typography -->
+
+    
+    <!-- Firebase JS SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 </head>
+
 <body>
-    <h1>hellooo</h1>
-</body>
-</html>
+
+    <header>
+        <h1>All Vendors List</h1>
+    </header>
+
+    <section id="search-container">
+        <input type="text" id="search-bar" placeholder="Search by product name">
+      
+    </section>
+    <div id="vendors">
+       
+        <div id="vendor-grid" class="vendor-grid">
+            <!-- Vendor cards will be dynamically inserted here -->
+        </div>
+    </div>
+<!-- Edit Vendor Dialog -->
+<div id="edit-overlay" class="overlay"></div>
+<div id="edit-dialog" class="dialog">
+    <h2>Edit Vendor</h2>
+    <label for="edit-vendor-name">Name:</label>
+    <input type="text" id="edit-vendor-name">
+
+    <label for="edit-vendor-address">Address:</label>
+    <input type="text" id="edit-vendor-address">
+
+    <label for="edit-vendor-mobile">Mobile:</label>
+    <input type="text" id="edit-vendor-mobile">
+
+    <label for="edit-vendor-image">Vendor Image:</label>
+    <input type="file" id="edit-vendor-image">
+    <p id="vendor-file-name">No file chosen</p>
+
+    <div class="dialog-buttons">
+        <button id="save-edit">Save</button>
+        <button id="cancel-edit">Cancel</button>
+    </div>
+</div>
+
+    
+<script src="../js/allVendorList.js"></script>
+    </body>
+    </html>

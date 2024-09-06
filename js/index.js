@@ -14,6 +14,8 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
 
@@ -32,7 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const role = userDoc.data().role;
             console.log(role);
             console.log(user.uid);
-
+            
+         
             // Show admin panel based on role
             document.getElementById('admin-panel').style.display = (role === 'Admin' || role === 'Vendor') ? 'block' : 'none';
             document.getElementById('user').style.display = 'block';
@@ -215,15 +218,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-  // Render product card and then update the button visibility
-  function renderProductCard(product) {
-    const { id, name, price, expiryDays, imageFileUrl, timestamp, vendorId } = product;
-    const newProductCard = document.createElement('div');
-    newProductCard.classList.add('product-card');
-    newProductCard.setAttribute('data-product-id', id);
-    newProductCard.setAttribute('data-vendor-id', vendorId); // Assuming vendorId is stored in the product data
+    // Render product card and then update the button visibility
+    function renderProductCard(product) {
+        const { id, name, price, expiryDays, imageFileUrl, timestamp, vendorId } = product;
+        const newProductCard = document.createElement('div');
+        newProductCard.classList.add('product-card');
+        newProductCard.setAttribute('data-product-id', id);
+        newProductCard.setAttribute('data-vendor-id', vendorId); // Assuming vendorId is stored in the product data
 
-    newProductCard.innerHTML = `
+        newProductCard.innerHTML = `
         <img src="${imageFileUrl}" alt="${name}">
         <h3>${name}</h3>
         <p>Price: ₹${price.toFixed(2)}</p>
@@ -232,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <button class="add" id="add">Add</button>  
         <button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>
     `;
-    document.getElementById('product-grid').appendChild(newProductCard);
+        document.getElementById('product-grid').appendChild(newProductCard);
         newProductCard.querySelector('img').addEventListener('click', () => {
             modal.style.display = "block";
             modalImg.src = imageFileUrl;
@@ -287,13 +290,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 db.collection('users').doc(user.uid).get().then(userDoc => {
                     const role = userDoc.data().role;
                     updateDeleteButtonsVisibility(role, user.uid);
-                   
+
                 });
             }
         });
     }
 
-    
+
     function logAction(userId, actionType, resourceId, email) {
         db.collection('auditLogs').add({
             userId,
@@ -394,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     productCards.forEach((card, index) => {
                         setTimeout(() => {
                             card.classList.add('animate');
-                        }, index *50); // Stagger animation by 100ms
+                        }, index * 50); // Stagger animation by 100ms
                     });
                 }
             });
@@ -411,34 +414,34 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return id;
     }
-    
+
     // Function to check if the ID already exists in Firestore
     async function isIdUnique(id) {
         const productRef = db.collection('products').doc(id);
         const doc = await productRef.get();
         return !doc.exists; // Return true if the ID does not exist
     }
-    
+
     // Function to generate a unique ID and save a new product
     async function getUniqueProductId() {
         let unique = false;
         let id = '';
-    
+
         while (!unique) {
             id = generateRandomId();
             unique = await isIdUnique(id);
         }
-    
+
         return id;
     }
-    
+
 
     const productForm = document.getElementById('product-form');
     productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         document.getElementById('spinner').style.display = 'block';
-      //  const productId = document.getElementById('product-id').value.trim();
-      const productId= await getUniqueProductId();
+        //  const productId = document.getElementById('product-id').value.trim();
+        const productId = await getUniqueProductId();
         const name = document.getElementById('product-name').value.trim();
         const price = parseFloat(document.getElementById('product-price').value);
         const expiryDays = parseInt(document.getElementById('expiry-days').value, 10);
@@ -529,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const vendorRef = db.collection('vendors').doc(user.email);
             const vendorDoc = await vendorRef.get();
             const h2 = document.getElementById('h2-vendorList');
-console.log(77)
+            console.log(77)
             if (vendorDoc.exists) {
                 // Vendor exists, hide form and display vendor list
                 h2.style.display = 'block';
@@ -551,30 +554,30 @@ console.log(77)
     });
 });
 
-document.getElementById('vendor-edit-cancel').style.display='none';
+document.getElementById('vendor-edit-cancel').style.display = 'none';
 // Handle vendor edit functionality
 async function handleEditVendor(vendorData) {
 
     db.collection('vendors').doc(vendorData.email).get().then((vendorDoc) => {
         document.getElementById('edit-AddvendorH1').textContent = "Edit Vendor";
-        const cancel= document.getElementById('vendor-edit-cancel');
-        cancel.addEventListener('click',()=>{
+        const cancel = document.getElementById('vendor-edit-cancel');
+        cancel.addEventListener('click', () => {
             document.getElementById('edit-AddvendorH1').textContent = "Add Vendor";
-            cancel.style.display='none'
-           // Hide the vendor form container
-    const formContainer = document.getElementById('vendor-form-container');
-    if (formContainer) {
-        formContainer.style.display = 'none';
-       
-    }
+            cancel.style.display = 'none'
+            // Hide the vendor form container
+            const formContainer = document.getElementById('vendor-form-container');
+            if (formContainer) {
+                formContainer.style.display = 'none';
 
-    // Show the vendor list or edit button
-    const vendorListContainer = document.getElementById('vendor-list-container');
-    if (vendorListContainer) {
-        vendorListContainer.style.display = 'block'; // Ensure the vendor list is visible
-    }
+            }
+
+            // Show the vendor list or edit button
+            const vendorListContainer = document.getElementById('vendor-list-container');
+            if (vendorListContainer) {
+                vendorListContainer.style.display = 'block'; // Ensure the vendor list is visible
+            }
         })
-        document.getElementById('vendor-edit-cancel').style.display='block';
+        document.getElementById('vendor-edit-cancel').style.display = 'block';
         const vendorData = vendorDoc.data();
         document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
 
@@ -644,7 +647,7 @@ async function handleDeleteVendor(vendorData) {
             vendorCard.remove();
             // After removal, refresh the vendor list and show the form if needed
             refreshVendorListAndForm();
-            
+
         }, 600);
     } catch (error) {
         console.error('Error deleting vendor:', error);
@@ -692,13 +695,13 @@ async function refreshVendorListAndForm() {
 
     if (user) {
         const userRole = await getUserRole(user.uid);
-    
+
         // Fetch all vendors from Firestore
         const vendorsSnapshot = await db.collection('vendors').get();
         const userDoc = await db.collection('vendors').doc(user.email).get(); // Get the document and check its existence
-        
+
         const h2 = document.getElementById('h2-vendorList');
-        
+
         if (userRole === 'Vendor') {
             if (userDoc.exists) {
                 // Vendor data exists, show the vendor list and hide the form
@@ -711,7 +714,7 @@ async function refreshVendorListAndForm() {
                 document.getElementById('vendors').style.display = 'block';
                 h2.style.display = 'block';
             }
-        } else if (userRole === 'Admin' || userRole=== 'User') {
+        } else if (userRole === 'Admin' || userRole === 'User') {
             // Admins should always see the vendor list and not the form
             document.getElementById('vendor-form-container').style.display = 'none';
             document.getElementById('vendors').style.display = 'block';
@@ -722,25 +725,26 @@ async function refreshVendorListAndForm() {
             document.getElementById('vendors').style.display = 'none';
             h2.style.display = 'none';
         }
-    
+
         // Display all vendors
         await displayAllVendors(userRole, user.email);
     } else {
         console.error('User not authenticated');
     }
-    
-}
-async function displayAllVendors(userRole, userEmail) {
+
+}async function displayAllVendors(userRole, userEmail) {
     try {
         const vendorsSnapshot = await db.collection('vendors').get();
         const vendorGrid = document.getElementById('vendor-grid');
         vendorGrid.innerHTML = ''; // Clear previous vendors
 
-        let index = 0;
         let vendors = [];
-        
+
         vendorsSnapshot.forEach((doc) => {
-            vendors.push(doc.data());
+            vendors.push({
+                id: doc.id,
+                ...doc.data()
+            });
         });
 
         // Display initial chunk of vendors
@@ -753,23 +757,21 @@ async function displayAllVendors(userRole, userEmail) {
             viewMoreButton.className = 'view-more';
             document.getElementById('vendor-grid').parentNode.appendChild(viewMoreButton);
 
-            const currentUserEmail = auth.currentUser ? auth.currentUser.email : '';
-
             viewMoreButton.addEventListener('click', () => {
-                window.location.href='html/allVendorList.html';
-                const targetUrl = `html/vendorProduct.html?vendorId=${encodeURIComponent(vendorData.userId)}&userEmail=${encodeURIComponent(currentUserEmail)}`;
+                const vendorIds = vendors.map(vendor => vendor.id);
+                const targetUrl = `html/allVendorList.html?vendorIds=${encodeURIComponent(vendorIds.join(','))}`;
                 window.location.href = targetUrl;
             });
-           
-        
-            
         }
-      
+
         document.getElementById('vendors').classList.remove('hidden');
     } catch (error) {
         console.error('Error displaying vendors:', error);
     }
 }
+
+// Example of redirecting to the new page with user information
+
 
 function displayVendorsChunk(vendors, userRole, userEmail) {
     const vendorGrid = document.getElementById('vendor-grid');
@@ -789,15 +791,18 @@ function displayVendorsChunk(vendors, userRole, userEmail) {
                <button class="view-button" id="view-button">View Product</button>
                 </div>
         `;
-        
+
         vendorGrid.appendChild(vendorCard);
-        
+
         const currentUserEmail = auth.currentUser ? auth.currentUser.email : '';
-        vendorCard.addEventListener('click', () => {
-            //  window.location.href='html/allVendorList.html';
-              const targetUrl = `html/vendorProduct.html?vendorId=${encodeURIComponent(vendorData.userId)}&userEmail=${encodeURIComponent(currentUserEmail)}`;
-              window.location.href = targetUrl;
-          });
+
+        const viewButton = vendorCard.querySelector('.view-button');
+       // const currentUserEmail = auth.currentUser ? auth.currentUser.email : '';
+        
+        viewButton.addEventListener('click', () => {
+            const targetUrl = `html/vendorProduct.html?vendorId=${encodeURIComponent(vendorData.userId)}&userEmail=${encodeURIComponent(currentUserEmail)}`;
+            window.location.href = targetUrl;
+        });
         const editButton = vendorCard.querySelector('.edit-button');
         if (editButton) {
             editButton.addEventListener('click', () => {
@@ -814,7 +819,7 @@ function displayVendorsChunk(vendors, userRole, userEmail) {
                 }
             });
         }
-      
+
         vendorCard.style.animationDelay = `${index * 0.5}s`;
     });
 }

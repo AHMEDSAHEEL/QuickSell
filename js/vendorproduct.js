@@ -11,15 +11,28 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
+let userRole = '';
+
 document.addEventListener('DOMContentLoaded', async function () {
+//     auth.onAuthStateChanged(async (user) => {
+//         if (user) {
+//             // Fetch user role and then refresh the vendor list based on their role
+//             userRole = await getUserRole(user.uid);
+//             console.log(userRole);
+//         }
+//     else{
+//         console.log("not user")
+//     }});
+            
     const params = new URLSearchParams(window.location.search);
     const vendorId = params.get('vendorId');
-    const userEmail = params.get('userEmail');
-    console.log("vendor's Id: "+vendorId+"Current User-Email: "+ userEmail)
+   const userEmail = params.get('userEmail');
+ //  console.log(userRole)
+    console.log("vendor's Id: "+vendorId +"email: "+userEmail)
     const vendorNameElement = document.getElementById('vendor-name');
     const productGrid = document.getElementById('product-grid');
     const noProductsMessage = document.getElementById('no-products-message');
-    let userRole = 'User';
+   
 
     if (vendorId) {
         try {
@@ -31,7 +44,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 vendorNameElement.textContent = `Products by ${vendorData.name}`;
 
 
-                const userDoc = await db.collection('users').where('email', '==', userEmail).get();
+               const userDoc = await db.collection('users').where('email', '==', userEmail).get();
+               console.log(userEmail)
              
                 if (!userDoc.empty) {
                     const roleDoc = userDoc.docs[0].data();
@@ -79,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             <p class="expiry-timer">Expires in ${expiryDays} days</p>
             <button class="buy" id="buy">Buy</button>
             <button class="add" id="add">Add</button>
-          ${(userRole === 'Admin' || (userRole === 'Vendor' && userEmail === email)) ? `<button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>` : ''}
+          ${(userRole === 'Admin' || (userRole === 'Vendor' && email===userEmail)) ? `<button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>` : ''}
         `;
         document.getElementById('product-grid').appendChild(newProductCard);
 
@@ -181,4 +195,16 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error('Error deleting product:', error);
         }
     }
+    // async function getUserRole(uid) {
+    //     try {
+    //         const userDoc = await db.collection('users').doc(uid).get();
+    //         if (userDoc.exists) {
+    //             return userDoc.data().role;
+    //         }
+    //         return null;
+    //     } catch (error) {
+    //         console.error('Error getting user role:', error);
+    //         return null;
+    //     }
+    // }
 });

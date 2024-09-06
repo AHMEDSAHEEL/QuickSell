@@ -1,0 +1,331 @@
+/* Reset and Basic Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background:#200b4e;
+    
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-image: linear-gradient(#13072e,#200b4e);
+   
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+#search-container {
+    background: #200b4e;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.7s ease-out both; 
+}
+
+/* Slide animation keyframes */
+@keyframes slideDown {
+    0% {
+        transform: translateY(-100%); /* Start off-screen */
+        opacity: 0; /* Invisible */
+    }
+    100% {
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
+
+#search-bar {
+    width: 55%;
+    padding: 10px 15px;
+    border-radius: 30px;
+    border: 1px solid #ddd;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    border: 0;
+    outline: 0;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
+
+#search-bar:focus {
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3); 
+}
+* Vendor List Styles */
+#vendors {
+    padding: 20px;
+    
+    color: white; 
+    
+    
+        
+    
+}
+
+.vendor-grid {
+    /* display: flex;
+    flex-wrap: wrap;
+    gap: 20px; */
+    
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 30px;
+    justify-content: center;
+    margin: 20px;
+
+
+}
+
+.vendor-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    color:black;
+    position: relative;
+    
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0; /* Start hidden */
+    transform: translateY(20px);
+      animation: fadeInUp 1s ease-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.fade-out {
+    opacity: 0;
+    transform: translateY(-20px); /* Optional: Moves the element up a bit */
+}
+
+
+.vendor-card img {
+    width: 100%;
+    height: 290px;
+    border-radius: 5px;
+    transition: transform 0.5s ease;
+}
+.vendor-card img:hover{
+    transform: scale(1.03);
+}
+
+.vendor-card h3 {
+    margin: 10px 0;
+}
+
+.vendor-card p {
+    margin: 10px 5px;
+}
+.button-group{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 10PX;
+} 
+.button-group .edit-button ,.button-group .delete-button, .button-group .view-button{
+    
+    top: 10px;
+    right: 70px; 
+    background: #ff5722;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+  
+
+.button-group .edit-button:hover {
+    background:  #28a745;
+}
+.button-group .delete-button {
+    background: red;
+}
+.button-group .view-button {
+    background: #007bff;
+}
+
+.button-group .delete-button:hover {
+    background: #cb4949;
+}.admin .button-group .delete-button {
+    display: block;
+}
+
+.vendor-edit-cancel{
+    display: none;
+}
+/* Style for the edit dialog box */
+#edit-dialog {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+}
+
+/* Style for dialog title */
+#edit-dialog h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+}
+
+/* Style for the form fields */
+#edit-dialog input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#edit-dialog label {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Button styles */
+#edit-dialog .dialog-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#edit-dialog button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#save-edit {
+    background-color: #28a745;
+    color: #fff;
+}
+
+#cancel-edit {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Dark overlay behind the dialog */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none; /* Hidden by default */
+}
+
+@media (min-width: 2000px) {
+    .vendor-grid {
+        grid-template-columns: repeat(6, 1fr); /* 3 cards per row */
+    }
+
+}
+@media (min-width: 1600px) {
+    .vendor-grid {
+        grid-template-columns: repeat(5, 1fr); 
+    }
+
+}
+@media (max-width: 1599px) {
+    main {
+        margin-left: 0;
+        padding: 20px;
+    }
+    .vendor-grid {
+        grid-template-columns: repeat(4, 1fr); 
+    }
+   
+    #search-container {
+        padding: 25px;
+    }
+    #search-bar {
+        width: 70%;
+        font-size: 1.2rem;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    #search-bar {
+        width: 90%;
+        font-size: 1.3rem;
+        padding: 15px;
+    }
+
+    .vendor-grid {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+}
+
+@media (max-width: 480px) {
+    #search-container {
+        padding: 15px;
+    }
+    #search-bar {
+        width: 80%;
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    header h1{
+        font-size: 1.3rem;
+    }
+    .vendor-grid {
+        grid-template-columns: repeat(1, 1fr); 
+    }
+    .vendor-card{
+        width: 90%;
+        margin: 0 auto;
+        
+    }
+    #edit-dialog {
+        width: 300px;
+    }
+}
