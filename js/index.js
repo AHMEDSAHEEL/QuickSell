@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error saving product:', error);
         }
     }
-
+ let UserID='',prodID='';
     // Render product card and then update the button visibility
     function renderProductCard(product) {
         const { id, name, price, expiryDays, imageFileUrl, timestamp, vendorId } = product;
@@ -225,29 +225,62 @@ document.addEventListener('DOMContentLoaded', function () {
         newProductCard.classList.add('product-card');
         newProductCard.setAttribute('data-product-id', id);
         newProductCard.setAttribute('data-vendor-id', vendorId); // Assuming vendorId is stored in the product data
-
+    
         newProductCard.innerHTML = `
-        <img src="${imageFileUrl}" alt="${name}">
-        <h3>${name}</h3>
-        <p>Price: ₹${price.toFixed(2)}</p>
-        <p class="expiry-timer">Expires in ${expiryDays} days</p>
-        <button class="buy" id="buy">buy</button>
-        <button class="add" id="add">Add</button>  
-        <button class="delete" id="delete" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>
-    `;
+            <img src="${imageFileUrl}" alt="${name}">
+            <h3>${name}</h3>
+            <p>Price: ₹${price.toFixed(2)}</p>
+            <p class="expiry-timer">Expires in ${expiryDays} days</p>
+            <button class="buy" id="buy-${id}">Buy</button>  
+            <button class="add" id="add-${id}">Add</button>  
+            <button class="delete" id="delete-${id}" data-product-id="${id}" data-image-url="${imageFileUrl}">Delete</button>
+        `;
+    
         document.getElementById('product-grid').appendChild(newProductCard);
+    
+        // Image click modal
         newProductCard.querySelector('img').addEventListener('click', () => {
             modal.style.display = "block";
             modalImg.src = imageFileUrl;
             caption.textContent = name;
         });
-        newProductCard.querySelector('.delete').addEventListener('click', function () {
+    
+        // Buy button click
+        newProductCard.querySelector(`#buy-${id}`).addEventListener('click', async () => {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const userRef = db.collection('users').doc(user.uid);
+                    const userDoc = await userRef.get();
+                    UserID=user.uid;
+                    prodID=product.id;
+                    document.getElementById('buyer-name').value = userDoc.data().username;
+                    document.getElementById('buyer-email').value = user.email;
+                    document.getElementById('buyer-mobile').value = userDoc.data().mobile;
+                    
+                    // Set product-specific data
+                    document.getElementById('buyer-product-name').value = name;
+                    document.getElementById('buyer-product-price').value = `₹${price.toFixed(2)}`;
+    
+                    // Show the confirmation dialog
+                    document.getElementById('confirmation-dialog').style.display = 'block';
+                } else {
+                    console.log("No user is signed in.");
+                }
+            });
+        });
+    
+    
+      // Confirmation button click
+
+        newProductCard.querySelector('.delete').addEventListener('click', async function () {
             const productId = this.getAttribute('data-product-id');
             const imageUrl = this.getAttribute('data-image-url');
             const confirmDelete = confirm("Are you sure you want to delete this product?");
 
             if (confirmDelete) {
-                deleteProductFromFirestore(productId, imageUrl);
+                await deleteProductFromFirestore(productId, imageUrl);
+                const userId = auth.currentUser.uid;
+                await deleteProductFromProfile(userId, productId);
             }
         });
         const expiryTimer = newProductCard.querySelector('.expiry-timer');
@@ -294,7 +327,85 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
         });
+        
     }
+// Confirmation button click
+
+let listenerAttached = false;
+
+
+    if (!listenerAttached) {
+        listenerAttached = true;
+        
+        document.getElementById('product-grid').addEventListener('click', async (event) => {
+            if (event.target.classList.contains('add')) {
+                const productId = event.target.id.split('-')[1];
+                const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    
+                const productData = {
+                    id: productCard.getAttribute('data-product-id'), // Extract product ID
+                    vendorId: productCard.getAttribute('data-vendor-id'), // Extract vendor ID
+                    name: productCard.querySelector('h3').textContent, // Extract product name
+                    price: parseFloat(productCard.querySelector('p').textContent.replace('Price: ₹', '')), // Extract product price and convert to number
+                    imageFileUrl: productCard.querySelector('img').src, // Extract image URL
+                    expiryDays: parseInt(productCard.querySelector('.expiry-timer').textContent.replace('Expires in ', '').replace(' days', '')), // Extract expiry days
+                    timestamp: Date.now(), // Current timestamp
+                    user_id: auth.currentUser ? auth.currentUser.uid : null // Current user's ID if logged in
+                };
+                
+    
+                const user = auth.currentUser;
+                if (user) {
+                    const userId = user.uid;
+    
+                    try {
+                        await db.collection('users').doc(userId).collection('profileProducts').doc(productId).set(productData);
+                        alert('Product added to profile!');
+                    } catch (error) {
+                        console.error('Error adding product to profile:', error);
+                        alert('Error adding product to profile.');
+                    }
+                } else {
+                    alert('You must be logged in to add products to your profile.');
+                }
+            }
+        });
+    }
+
+
+
+
+    document.getElementById('confirm-purchase-btn').addEventListener('click', async () => {
+        const buyerName = document.getElementById('buyer-name').value;
+        const buyerEmail = document.getElementById('buyer-email').value;
+        const buyerMobile = document.getElementById('buyer-mobile').value;
+        const productName = document.getElementById('buyer-product-name').value;
+        const productPrice = document.getElementById('buyer-product-price').value;
+    
+        if (buyerName && buyerEmail && buyerMobile) {
+            await db.collection('orders').add({
+                UserID,
+                prodID,
+                buyerName,
+                buyerEmail,
+                buyerMobile,
+                productName,
+                productPrice,
+                
+                status: 'Pending'
+            });
+    
+            document.getElementById('confirmation-dialog').style.display = 'none';
+            alert('Purchase confirmed!');
+        } else {
+            alert('Please fill in all details');
+        }
+    });
+    
+    // Handle cancel button click to close the dialog
+    document.getElementById('cancel-purchase-btn').addEventListener('click', () => {
+        document.getElementById('confirmation-dialog').style.display = 'none';
+    });
 
 
     function logAction(userId, actionType, resourceId, email) {
@@ -306,6 +417,16 @@ document.addEventListener('DOMContentLoaded', function () {
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
     }
+    async function deleteProductFromProfile(userId, productId) {
+        try {
+            // Remove product data from user's profile in Firestore
+            await db.collection('users').doc(userId).collection('profileProducts').doc(productId).delete();
+            console.log(`Product ${productId} removed from user ${userId}'s profile`);
+        } catch (error) {
+            console.error('Error removing product from user profile:', error);
+        }
+    }
+    
     async function deleteProductFromFirestore(productId, imageFileUrl) {
         const productRef = db.collection('products').doc(productId);
 
@@ -444,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const productId = await getUniqueProductId();
         const name = document.getElementById('product-name').value.trim();
         const price = parseFloat(document.getElementById('product-price').value);
-        const expiryDays = parseInt(document.getElementById('expiry-days').value, 10);
+        const expiryDays = parseInt(document.getElementById('expiry-days').value);
         const imageFile = document.getElementById('product-image').files[0];
         console.log('Form submitted with:', { productId, name, price, expiryDays, imageFile });
 
@@ -554,85 +675,77 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-document.getElementById('vendor-edit-cancel').style.display = 'none';
-// Handle vendor edit functionality
-async function handleEditVendor(vendorData) {
+ //Function to edit vendor details
+function handleEditVendor(vendorId) {
+    
+    const editDialog = document.getElementById('edit-dialog');
+    const editOverlay = document.getElementById('edit-overlay');
+    const vendorImageInput = document.getElementById('edit-vendor-image');
+    let newImageFile = null;
 
-    db.collection('vendors').doc(vendorData.email).get().then((vendorDoc) => {
-        document.getElementById('edit-AddvendorH1').textContent = "Edit Vendor";
-        const cancel = document.getElementById('vendor-edit-cancel');
-        cancel.addEventListener('click', () => {
-            document.getElementById('edit-AddvendorH1').textContent = "Add Vendor";
-            cancel.style.display = 'none'
-            // Hide the vendor form container
-            const formContainer = document.getElementById('vendor-form-container');
-            if (formContainer) {
-                formContainer.style.display = 'none';
+    if (!editDialog || !editOverlay) {
+        console.error('Edit dialog or overlay not found in DOM');
+        return;
+    }
 
-            }
+    editDialog.style.display = 'block';
+    editOverlay.style.display = 'block';
 
-            // Show the vendor list or edit button
-            const vendorListContainer = document.getElementById('vendor-list-container');
-            if (vendorListContainer) {
-                vendorListContainer.style.display = 'block'; // Ensure the vendor list is visible
-            }
-        })
-        document.getElementById('vendor-edit-cancel').style.display = 'block';
-        const vendorData = vendorDoc.data();
-        document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
-
-        document.getElementById('vendor-name').value = vendorData.name;
-        document.getElementById('shop-address').value = vendorData.address;
-        document.getElementById('mobile-number').value = vendorData.mobile;
-        document.getElementById('vendor-image').value = ''; // Clear file input
-        document.getElementById('vendor-form-container').style.display = 'block';
-        document.getElementById('vendors').style.display = 'block';
-
-        const fileNameDisplay = document.getElementById('vendor-file-name');
-        fileNameDisplay.textContent = 'No file chosen';
-
-        document.getElementById('vendor-form').onsubmit = async function (e) {
-            e.preventDefault();
-            document.getElementById('vendor-spinner').style.display = 'block';
-
-            const name = document.getElementById('vendor-name').value.trim();
-            const address = document.getElementById('shop-address').value.trim();
-            const mobile = document.getElementById('mobile-number').value.trim();
-            const imageFile = document.getElementById('vendor-image').files[0];
-
-            if (!name || !address || !mobile) {
-                alert('Please fill out all fields.');
-                return;
-            }
-
-            try {
-                let imageUrl = vendorData.imageUrl; // Keep existing image if not updated
-
-                if (imageFile) {
-                    imageUrl = await uploadVendorImage(imageFile, auth.currentUser.email);
-                }
-
-                const updatedVendorData = {
-                    name,
-                    address,
-                    mobile,
-                    imageUrl,
-                    timestamp: Date.now()
-                };
-
-                await db.collection('vendors').doc(vendorData.email).update(updatedVendorData);
-                displayAllVendors(await getUserRole(auth.currentUser.uid), vendorData.email);
-                document.getElementById('vendor-form-container').style.display = 'none';
-                alert('Successfully updated vendor');
-            } catch (error) {
-                console.error('Error updating vendor information:', error);
-            } finally {
-                document.getElementById('vendor-spinner').style.display = 'none';
-            }
-        };
-    }).catch(error => {
-        console.error('Error fetching vendor data:', error);
+    // Fetch vendor data and populate the form
+    db.collection('vendors').doc(vendorId).get().then(doc => {
+        if (doc.exists) {
+            const vendorData = doc.data();
+            document.getElementById('edit-vendor-name').value = vendorData.name;
+            document.getElementById('edit-vendor-address').value = vendorData.address;
+            document.getElementById('edit-vendor-mobile').value = vendorData.mobile;
+            document.getElementById('edit-file-name').style.display='block';
+            document.getElementById('edit-file-name').textContent = vendorData.imageUrl ? 'Current Image Selected' : 'No Image Selected';
+        }
     });
+
+    vendorImageInput.addEventListener('change', function () {
+        let file = this.files[0];
+        const fileNameDisplay = document.getElementById('vendor-file-name').style.display='block';
+        fileNameDisplay.textContent = file ? `Selected file: ${file.name}` : 'No file chosen';
+        document.getElementById('edit-file-name').textContent =file.name
+        newImageFile = file;
+    });
+
+    document.getElementById('save-edit').onclick = async function () {
+        document.getElementById('edit-spinner').style.display='block';
+        const updatedName = document.getElementById('edit-vendor-name').value;
+        const updatedAddress = document.getElementById('edit-vendor-address').value;
+        const updatedMobile = document.getElementById('edit-vendor-mobile').value;
+        let newImageUrl = null;
+
+        if (newImageFile) {
+            newImageUrl = await uploadVendorImage(newImageFile, vendorId);
+        }
+
+        const updateData = {
+            name: updatedName,
+            address: updatedAddress,
+            mobile: updatedMobile
+        };
+
+        if (newImageUrl) {
+            updateData.imageUrl = newImageUrl;
+        }
+        document.getElementById('edit-spinner').style.display='none';
+
+        await db.collection('vendors').doc(vendorId).update(updateData);
+        editDialog.style.display = 'none';
+        editOverlay.style.display = 'none';
+        await refreshVendorListAndForm(); // Refresh the list after updating
+    };
+
+    document.getElementById('cancel-edit').onclick = function () {
+       
+        editDialog.style.display = 'none';
+        editOverlay.style.display = 'none';
+     
+
+    };
 }
 
 // Handle vendor delete functionality
@@ -749,7 +862,7 @@ async function refreshVendorListAndForm() {
 
         // Display initial chunk of vendors
         displayVendorsChunk(vendors.slice(0, 4), userRole, userEmail);
-
+        
         // Show "View More" button if there are more vendors
         if (vendors.length > 4) {
             const viewMoreButton = document.createElement('button');
@@ -762,7 +875,7 @@ async function refreshVendorListAndForm() {
                 const targetUrl = `html/allVendorList.html?vendorIds=${encodeURIComponent(vendorIds.join(','))}`;
                 window.location.href = targetUrl;
             });
-        }
+        }  
 
         document.getElementById('vendors').classList.remove('hidden');
     } catch (error) {
@@ -807,7 +920,7 @@ function displayVendorsChunk(vendors, userRole, userEmail) {
         if (editButton) {
             editButton.addEventListener('click', () => {
                 document.getElementById('vendor-form-container').scrollIntoView({ behavior: 'auto' });
-                handleEditVendor(vendorData);
+                handleEditVendor(vendorData.email);
             });
         }
 
@@ -885,4 +998,5 @@ vendorImageInput.addEventListener('change', function () {
     const fileNameDisplay = document.getElementById('vendor-file-name');
     fileNameDisplay.textContent = fileName ? `Selected file: ${fileName}` : 'No file chosen';
 });
+      // Confirmation button click
 

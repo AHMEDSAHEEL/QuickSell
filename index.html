@@ -77,7 +77,29 @@
         <img class="modal-content" id="modal-img" alt="model">
         <div id="caption"></div>
     </div>
+<!-- Confirmation Dialog Box for Buying -->
+<div id="confirmation-dialog" class="dialog-box" style="display:none;">
+    <div class="dialog-content">
+        <h3>Confirm Purchase</h3>
+        <label for="buyer-name">Name:</label>
+        <input type="text" id="buyer-name" required><br>
 
+        <label for="buyer-email">Email:</label>
+        <input type="email" id="buyer-email" readonly><br>
+
+        <label for="buyer-mobile">Mobile:</label>
+        <input type="tel" id="buyer-mobile" required><br>
+
+        <label for="buyer-product-name">Product:</label>
+        <input type="text" id="buyer-product-name" readonly><br>
+
+        <label for="buyer-product-price">Price:</label>
+        <input type="text" id="buyer-product-price" readonly><br>
+
+        <button class="btn" id="confirm-purchase-btn">Confirm Purchase</button>
+        <button class="btn" id="cancel-purchase-btn">Cancel</button>
+    </div>
+</div>
     <!-- Vendor Management Section -->
 
     <div id="vendors">
@@ -89,22 +111,47 @@
 
 
     <div id="vendor-form-container">
-        <h2 id="edit-AddvendorH1">Add Vendor</h2>
+        <h2>Add Vendor</h2>
         <form id="vendor-form">
             <input type="text" id="vendor-name" placeholder="Vendor Name" required>
             <input type="text" id="shop-address" placeholder="Shop Address" required>
             <input type="tel" id="mobile-number" placeholder="Mobile Number" required>
             <label for="vendor-image" id="custom-vendor-file-label" tabindex="0">Choose an Image</label>
-            <input type="file" id="vendor-image" name="vendorImage" accept="image/*" required>
+            <input type="file" id="vendor-image" class="vendor-images" name="vendorImage" accept="image/*" required>
             <p id="vendor-file-name">No file chosen</p>
             <div id="vendor-spinner" class="spinner hidden"></div>
           
             <button type="submit">Add Vendor</button>
-            <button  id="vendor-edit-cancel">Cancel</button>
+        
         </form>
         <p id="vendor-message"></p>
     </div>
 
+<!-- Edit Vendor Dialog -->
+<div id="edit-overlay" class="overlay"></div>
+<div id="edit-dialog" class="dialog">
+    <h2>Edit Vendor</h2>
+    <label for="edit-vendor-name">Name:</label>
+    <input type="text" id="edit-vendor-name">
+
+    <label for="edit-vendor-address">Address:</label>
+    <input type="text" id="edit-vendor-address">
+
+    <label for="edit-vendor-mobile">Mobile:</label>
+    <input type="text" id="edit-vendor-mobile">
+
+    <label for="edit-vendor-image" id="custom-vendor-edit-file-label" tabindex="0" style="color: white;">Choose an Image</label>
+    <input type="file" id="edit-vendor-image">
+    <p id="edit-file-name">No file chosen</p>
+    <div id="edit-spinner" class="spinner hidden"></div>
+    <div class="dialog-buttons">
+        <button id="save-edit">Save</button>
+        <button id="cancel-edit">Cancel</button>
+    </div>
+</div>
+
+    
+    
     <!-- Admin Panel (CRUD Operations) -->
     <div id="admin-panel" class="admin-panel">
         <h2>Admin Panel</h2>

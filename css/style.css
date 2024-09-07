@@ -360,6 +360,53 @@ li:hover{
     text-decoration: none;
     cursor: pointer;
 }
+
+/* Dialog Box Styles */
+.dialog-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    z-index: 1000;
+    width: 400px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.dialog-content input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    color: black;
+}
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+
+
+
 /* Vendor Form Styles */
 #vendor-form-container {
     display: none;
@@ -574,7 +621,83 @@ li:hover{
     background-color: #e64a19;
 }
 
+/* Style for the edit dialog box */
+#edit-dialog {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+}
 
+/* Style for dialog title */
+#edit-dialog h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+}
+
+/* Style for the form fields */
+#edit-dialog input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#edit-dialog label {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Button styles */
+#edit-dialog .dialog-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#edit-dialog button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#save-edit {
+    background-color: #28a745;
+    color: #fff;
+}
+
+#cancel-edit {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Dark overlay behind the dialog */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none; /* Hidden by default */
+}
 /* Footer Styles */
 footer {
     background-color:#13072e;
@@ -648,10 +771,34 @@ footer {
     .search-bar input {
         width: 150px;
     }
+    .edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
+    
+       
+        padding: 10px 15px;
+       
+    }
+}
+@media(max-width: 619px){
+    .vendor-card{
+        width: 75%;
+        margin: 0 auto;
+        
+    }
+    .vendor-card img{
+     height: 330px;
+        
+    }
 }
 
 /* Mobile Phones */
 @media (max-width: 580px) {
+    #edit-dialog {
+        width: 300px;
+    }
+    .dialog-box {
+      width: 240px;
+    }
+    
     .hamburger {
         display: flex;
         order: 1;
@@ -743,12 +890,46 @@ footer {
 
 
 @media (max-width: 420px) {
-.edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
+    .edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
+        
     
+        padding:  8px 12px;
+     
+    }
 
-    padding:  8px 12px;
- 
-}
+  
+    }
+    @media (max-width: 370px) {
+        .edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
+            
+        
+            padding:  8px 12px;
+         
+        }
+        #edit-dialog {
+            width: 270px;
+        }
+        .edit-delete-container .edit-button,.edit-delete-container .delete-button,.edit-delete-container .view-button{
+    
+       
+            padding: 5px;
+           
+        }
+          
+       
+        
+        }
+
+     
+@media (max-width: 345px) {
+    #edit-dialog {
+        width: 230px;
+    }
+    .admin-panel {
+     
+        width: 235px;
+    }    
+      
 }
 .spinner {
     display: none;
@@ -781,7 +962,7 @@ footer {
     100% { transform: rotate(360deg); }
 }
 /* Hide the default file input */
-input[type="file"] {
+ input[type="file"]{
     display: none;
 }
 
@@ -798,9 +979,22 @@ input[type="file"] {
     transition: background-color 0.3s ease;
     margin-top: 5px;
 }
-
+#custom-vendor-edit-file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:#3498db; /* Button color */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    margin-top: 5px;
+}
+#edit-file-name{
+    color: black;
+}
 /* Change the background color on hover */
-#custom-file-label:hover {
+#custom-file-label:hover,#custom-vendor-edit-file-label:hover {
     background-color: #280b6c;
 }
 

@@ -11,7 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
-
 </head>
 
 <body>
@@ -28,29 +27,23 @@
                     <input type="file" id="profile-picture-input" style="display: none;">
                 </div>
                 <h2 id="username">loading...</h2>
-            
                 <div class="profile-detail">
                     <i class="fas fa-mobile-alt"></i>
                     <span id="user-mobile">+91 6382420093</span>
                 </div>
-            
                 <div class="profile-detail">
                     <i class="fas fa-envelope"></i>
                     <span id="user-email">shaheel123as@gmail.com</span>
                 </div>
-            
                 <div class="profile-detail">
                     <i class="fas fa-map-marker-alt"></i>
                     <span id="user-address">Ponmani nager,Thittuvilai,Kanyakumari-629852</span>
                 </div>
                 <div id="loader" class="loader"></div>
-              
-              <div class="save-btn">
-                <button class="btn" id="save-button">Save Profile</button>
-                
+                <div class="save-btn">
+                    <button class="btn" id="save-button">Save Profile</button>
                 </div>
             </div>
-            
 
             <div class="profile-content">
                 <!-- Orders Section -->
@@ -78,20 +71,10 @@
                 <div class="card">
                     <div class="section" id="cart-section">
                         <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
-                        <ul>
-                            <li>
-                                <span>Product 1</span>
-                                <span>Quantity: 2</span>
-                            </li>
-                            <li>
-                                <span>Product 2</span>
-                                <span>Quantity: 1</span>
-                            </li>
-                            <li>
-                                <span>Product 3</span>
-                                <span>Quantity: 3</span>
-                            </li>
-                        </ul>
+                        <div id="profile-products" class="product-grid">
+                            <!-- Products will be dynamically inserted here -->
+                       
+                        </div>
                     </div>
                 </div>
 
