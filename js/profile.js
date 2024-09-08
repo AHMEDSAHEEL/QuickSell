@@ -123,40 +123,94 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('No user signed in or no file selected.');
         }
     });
+    const carouselWrapper = document.querySelector('.carousel-wrapper');
+    const paginationContainer = document.querySelector('.pagination-container');
+    const viewAllButton = document.getElementById('view-all-btn');
+    let currentIndex = 0;
 
-    // Function to display products in the user's profile
     async function displayProfileProducts(user_id) {
-        const userId = user_id;
-        console.log('Inside displayProfileProducts, User ID:', userId);
+        // Fetch and display product cards
+        // For demonstration, I'll assume you have a function to fetch products
+        const profileProductsSnapshot = await db.collection('users').doc(user_id).collection('profileProducts').get();
+        carouselWrapper.innerHTML = ''; // Clear existing products
+        paginationContainer.innerHTML = ''; // Clear existing pagination
 
-        if (!userId) {
-            console.error('User ID is empty');
-            return;
-        }
+        const productCount = profileProductsSnapshot.size;
+        const productCards = [];
+        
+        profileProductsSnapshot.forEach(doc => {
+            const product = doc.data();
+            const productCard = document.createElement('div');
+            productCard.classList.add('product-card');
+            productCard.innerHTML = `
+                <img src="${product.imageFileUrl}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>Price: ₹${product.price.toFixed(2)}</p>
+                <p>Expires in ${product.expiryDays} days</p>
+                <button class="delete" data-product-id="${doc.id}">Remove</button>
+            `;
+            productCard.dataset.productId = doc.id; // Add the product ID as a data attribute
+            productCards.push(productCard);
+            carouselWrapper.appendChild(productCard);
+        });
 
-        const profileProductsDiv = document.getElementById('profile-products');
-
-        try {
-            const profileProductsSnapshot = await db.collection('users').doc(userId).collection('profileProducts').get();
-            profileProductsDiv.innerHTML = ''; // Clear existing products
-
-            profileProductsSnapshot.forEach(doc => {
-                const product = doc.data();
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-                productCard.innerHTML = `
-                    <img src="${product.imageFileUrl}" alt="${product.name}">
-                    <h3>${product.name}</h3>
-                    <p>Price: ₹${product.price.toFixed(2)}</p>
-                    <p>Expires in ${product.expiryDays} days</p>
-                    <button class="delete" data-product-id="${doc.id}">Remove</button>
-                `;
-                profileProductsDiv.appendChild(productCard);
+        // Create pagination circles
+        for (let i = 0; i < productCount; i++) {
+            const circle = document.createElement('div');
+            circle.classList.add('pagination-circle');
+            circle.addEventListener('click', () => {
+                currentIndex = i;
+                updateCarousel();
             });
-        } catch (error) {
-            console.error('Error fetching profile products:', error);
+            paginationContainer.appendChild(circle);
         }
+
+        // Show or hide the "View All" button
+        viewAllButton.style.display = productCount > 3 ? 'block' : 'none';
+
+        // Initialize Hammer.js for swipe functionality
+        initializeSwipe();
+
+        updateCarousel(); // Initialize carousel position
     }
+
+
+
+    function initializeSwipe() {
+        const hammer = new Hammer(carouselWrapper);
+
+        hammer.on('swipeleft', () => {
+            const productCards = document.querySelectorAll('.product-card');
+            if (currentIndex < productCards.length - 1) {
+                currentIndex++;
+                updateCarousel();
+            }
+        });
+
+        hammer.on('swiperight', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel();
+            }
+        });
+    }
+
+    function updateCarousel() {
+        const productCards = document.querySelectorAll('.product-card');
+        const offset = -currentIndex * 100;
+        carouselWrapper.style.transform = `translateX(${offset}%)`;
+
+        // Update pagination circles
+        const circles = document.querySelectorAll('.pagination-circle');
+        circles.forEach((circle, index) => {
+            circle.classList.toggle('active', index === currentIndex);
+        });
+    }
+
+    // View All button click handler
+    viewAllButton.addEventListener('click', () => {
+        window.location.href = 'allProducts.html'; // Change this URL to your "View All" page
+    });
 
     // Function to remove a product card from the user's profile
     async function removeProductCard(productId, userID) {
@@ -169,7 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove the product card from the UI
             const productCard = document.querySelector(`[data-product-id="${productId}"]`);
             if (productCard) {
-                productCard.remove(); // Remove the product card from the DOM
+                productCard.remove();
+                updateCarousel(); // Remove the product card from the DOM
             } else {
                 console.error('Product card not found');
             }
