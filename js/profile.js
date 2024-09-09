@@ -195,8 +195,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateCarousel() {
-        const productCards = document.querySelectorAll('.product-card');
+    async function removeProductCard(productId, userID) {
+    const userId = userID;
+    try {
+        // Remove the product document from Firestore
+        await db.collection('users').doc(userId).collection('profileProducts').doc(productId).delete();
+        console.log(`Product ${productId} removed from user ${userId}'s profile`);
+
+        // Remove the product card from the UI
+        const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+        if (productCard) {
+            productCard.remove();
+
+            // Update the product card list after removal
+            const productCards = document.querySelectorAll('.product-card');
+
+            // If the last product was removed and `currentIndex` is out of bounds, adjust it
+            if (currentIndex >= productCards.length) {
+                currentIndex = productCards.length - 1;
+            }
+
+            // Update the carousel and pagination after the product is removed
+            updateCarousel();
+
+            // Hide "View All" button if fewer than 4 products are present
+            viewAllButton.style.display = productCards.length > 3 ? 'block' : 'none';
+
+        } else {
+            console.error('Product card not found');
+        }
+    } catch (error) {
+        console.error('Error removing product from profile:', error);
+    }
+}
+
+function updateCarousel() {
+    const productCards = document.querySelectorAll('.product-card');
+    if (productCards.length === 0) {
+        // If there are no more products, hide the carousel or show a message
+        carouselWrapper.style.display = 'none'; // Hide carousel when no products exist
+        paginationContainer.style.display = 'none'; // Hide pagination when no products exist
+    } else {
+        carouselWrapper.style.display = 'flex'; // Ensure the carousel is visible
+        paginationContainer.style.display = 'flex'; // Ensure pagination is visible
         const offset = -currentIndex * 100;
         carouselWrapper.style.transform = `translateX(${offset}%)`;
 
@@ -206,32 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
             circle.classList.toggle('active', index === currentIndex);
         });
     }
+}
 
-    // View All button click handler
-    viewAllButton.addEventListener('click', () => {
-        window.location.href = 'allProducts.html'; // Change this URL to your "View All" page
-    });
-
-    // Function to remove a product card from the user's profile
-    async function removeProductCard(productId, userID) {
-        const userId = userID;
-        try {
-            // Remove the product document from Firestore
-            await db.collection('users').doc(userId).collection('profileProducts').doc(productId).delete();
-            console.log(`Product ${productId} removed from user ${userId}'s profile`);
-
-            // Remove the product card from the UI
-            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-            if (productCard) {
-                productCard.remove();
-                updateCarousel(); // Remove the product card from the DOM
-            } else {
-                console.error('Product card not found');
-            }
-        } catch (error) {
-            console.error('Error removing product from profile:', error);
-        }
-    }
 
     // Event listener for delete buttons
     document.getElementById('profile-products').addEventListener('click', async (event) => {

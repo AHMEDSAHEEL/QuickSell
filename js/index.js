@@ -306,7 +306,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (timeLeft <= 0) {
                 clearInterval(timerInterval); // Stop the interval
                 expiryTimer.textContent = 'Expired'; // Update text to 'Expired'
-
+                newProductCard.querySelector(`#buy-${id}`).style.display="none"
+                newProductCard.querySelector(`#add-${id}`).style.display="none"
+                newProductCard.querySelector(`#delete-${id}`).style.display="none"
                 setTimeout(() => {
                     // Remove the product card from the DOM after the grace period
                     deleteProductFromFirestore(id, imageFileUrl);
@@ -408,11 +410,11 @@ let listenerAttached = false;
     });
 
 
-    function logAction(userId, actionType, resourceId, email) {
-        db.collection('auditLogs').add({
+    function logAction(userId, actionType, productId, email) {
+        db.collection('users').doc(userId).collection('log').add({
             userId,
             actionType,
-            resourceId,
+            productId,
             email,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -845,8 +847,10 @@ async function refreshVendorListAndForm() {
         console.error('User not authenticated');
     }
 
-}async function displayAllVendors(userRole, userEmail) {
-    try {
+}
+
+async function displayAllVendors(userRole, userEmail) {
+    
         const vendorsSnapshot = await db.collection('vendors').get();
         const vendorGrid = document.getElementById('vendor-grid');
         vendorGrid.innerHTML = ''; // Clear previous vendors
@@ -862,9 +866,12 @@ async function refreshVendorListAndForm() {
 
         // Display initial chunk of vendors
         displayVendorsChunk(vendors.slice(0, 4), userRole, userEmail);
-        
+     
         // Show "View More" button if there are more vendors
-        if (vendors.length > 4) {
+        const existingViewMoreButton = document.querySelector('.view-more');
+    
+        
+            if(!existingViewMoreButton){
             const viewMoreButton = document.createElement('button');
             viewMoreButton.textContent = 'View More';
             viewMoreButton.className = 'view-more';
@@ -875,13 +882,18 @@ async function refreshVendorListAndForm() {
                 const targetUrl = `html/allVendorList.html?vendorIds=${encodeURIComponent(vendorIds.join(','))}`;
                 window.location.href = targetUrl;
             });
-        }  
+        } else if (existingViewMoreButton && vendors.length<=4) {
+            
+            existingViewMoreButton.remove(); // Remove button if no longer needed
+        }
+    
 
         document.getElementById('vendors').classList.remove('hidden');
-    } catch (error) {
-        console.error('Error displaying vendors:', error);
-    }
+    
+   
 }
+   
+
 
 // Example of redirecting to the new page with user information
 

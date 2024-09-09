@@ -42,7 +42,7 @@ body {
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 1.5fr 1.5fr;
     gap: 20px;
 }
 
@@ -196,7 +196,7 @@ body {
     margin: 0 auto;
 }
 #cart-section{
-width: 80%;
+width: 90%;
 margin: 0 auto;
 }
 .carousel-container {
@@ -269,7 +269,7 @@ margin: 0 auto;
 }
 
 .product-card img {
-    width: 70%;
+    width: 75%;
     height: 300px;
     border-radius: 5px;
     margin-bottom: 15px;

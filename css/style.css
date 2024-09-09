@@ -791,7 +791,7 @@ footer {
 }
 
 /* Mobile Phones */
-@media (max-width: 580px) {
+@media (max-width: 585px) {
     #edit-dialog {
         width: 300px;
     }
